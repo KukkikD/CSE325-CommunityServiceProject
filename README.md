@@ -29,7 +29,7 @@ Users can post community needs, browse service opportunities, sign up to help, a
 
 ## Team Members
 
-- Amornrat Howard
-- Team Member 2
-- Team Member 3
-- Team Member 4
+- Andres Daniel Costanzi
+- Amornrat Dizon Howard
+- Lievelyn De La Trinidad Zapata
+- Daniel Parra
