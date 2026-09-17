@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\buildMultiTargeting\CSE325-CommunityServiceProject.props" />
-</Project>
