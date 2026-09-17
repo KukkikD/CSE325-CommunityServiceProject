@@ -33,5 +33,3 @@ Users can post community needs, browse service opportunities, sign up to help, a
 - Amornrat Dizon Howard
 - Lievelyn De La Trinidad Zapata
 - Daniel Parra
-
-This is a test for the PR
