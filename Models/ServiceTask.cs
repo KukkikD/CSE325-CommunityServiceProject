@@ -8,8 +8,6 @@ namespace CSE325_CommunityServiceProject.Models
 
         public string Description { get; set; } = String.Empty;
 
-        public decimal EstimatedHours { get; set; }
-
         public int VolunteersNeeded { get; set; }
 
         public Guid ServiceOpportunityId { get; set; }
