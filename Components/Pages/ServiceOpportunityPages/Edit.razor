@@ -1,0 +1,121 @@
+@page "/serviceopportunities/edit"
+@using Microsoft.EntityFrameworkCore
+@using CSE325_CommunityServiceProject.Models
+
+@inject IDbContextFactory<CSE325_CommunityServiceProject.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>ServiceOpportunity</h2>
+<hr />
+@if (ServiceOpportunity is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="ServiceOpportunity" OnValidSubmit="UpdateServiceOpportunity" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="ServiceOpportunity.Id" value="@ServiceOpportunity.Id" />
+                <div class="mb-3">
+                    <label for="title" class="form-label">Title:</label>
+                    <InputText id="title" @bind-Value="ServiceOpportunity.Title" class="form-control" />
+                    <ValidationMessage For="() => ServiceOpportunity.Title" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description:</label>
+                    <InputText id="description" @bind-Value="ServiceOpportunity.Description" class="form-control" />
+                    <ValidationMessage For="() => ServiceOpportunity.Description" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="datetime" class="form-label">DateTime:</label>
+                    <InputDate id="datetime" @bind-Value="ServiceOpportunity.DateTime" class="form-control" />
+                    <ValidationMessage For="() => ServiceOpportunity.DateTime" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="location" class="form-label">Location:</label>
+                    <InputText id="location" @bind-Value="ServiceOpportunity.Location" class="form-control" />
+                    <ValidationMessage For="() => ServiceOpportunity.Location" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="status" class="form-label">Status</label>
+                    <InputSelect id="status"
+                                @bind-Value="ServiceOpportunity.Status"
+                                class="form-control">
+                        @foreach (var status in Enum.GetValues<OpportunityStatus>())
+                        {
+                            <option value="@status">@status</option>
+                        }
+                    </InputSelect>
+                </div>
+                <div class="mb-3">
+                    <label for="organizeruserid" class="form-label">OrganizerUserId:</label>
+                    <InputText id="organizeruserid" @bind-Value="ServiceOpportunity.OrganizerUserId" class="form-control" />
+                    <ValidationMessage For="() => ServiceOpportunity.OrganizerUserId" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/serviceopportunities">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private Guid Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private ServiceOpportunity? ServiceOpportunity { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        ServiceOpportunity ??= await context.ServiceOpportunities.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (ServiceOpportunity is null)
+        {
+            NavigationManager.NotFound();
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateServiceOpportunity()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(ServiceOpportunity!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!ServiceOpportunityExists(ServiceOpportunity!.Id))
+            {
+                NavigationManager.NotFound();
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/serviceopportunities");
+    }
+
+    private bool ServiceOpportunityExists(Guid id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.ServiceOpportunities.Any(e => e.Id == id);
+    }
+}

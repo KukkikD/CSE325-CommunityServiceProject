@@ -1,0 +1,41 @@
+@page "/serviceopportunities"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using CSE325_CommunityServiceProject.Models
+@using CSE325_CommunityServiceProject.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<CSE325_CommunityServiceProject.Data.ApplicationDbContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="serviceopportunities/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.ServiceOpportunities">
+    <PropertyColumn Property="serviceopportunity => serviceopportunity.Title" />
+    <PropertyColumn Property="serviceopportunity => serviceopportunity.Description" />
+    <PropertyColumn Property="serviceopportunity => serviceopportunity.DateTime" />
+    <PropertyColumn Property="serviceopportunity => serviceopportunity.Location" />
+    <PropertyColumn Property="serviceopportunity => serviceopportunity.Status" />
+    <PropertyColumn Property="serviceopportunity => serviceopportunity.OrganizerUserId" />
+
+    <TemplateColumn Context="serviceopportunity">
+        <a href="@($"serviceopportunities/edit?id={serviceopportunity.Id}")">Edit</a> |
+        <a href="@($"serviceopportunities/details?id={serviceopportunity.Id}")">Details</a> |
+        <a href="@($"serviceopportunities/delete?id={serviceopportunity.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private ApplicationDbContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

@@ -1,0 +1,56 @@
+@page "/serviceopportunities/details"
+@using Microsoft.EntityFrameworkCore
+@using CSE325_CommunityServiceProject.Models
+@inject IDbContextFactory<CSE325_CommunityServiceProject.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>ServiceOpportunity</h2>
+    <hr />
+    @if (serviceopportunity is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Title</dt>
+            <dd class="col-sm-10">@serviceopportunity.Title</dd>
+            <dt class="col-sm-2">Description</dt>
+            <dd class="col-sm-10">@serviceopportunity.Description</dd>
+            <dt class="col-sm-2">DateTime</dt>
+            <dd class="col-sm-10">@serviceopportunity.DateTime</dd>
+            <dt class="col-sm-2">Location</dt>
+            <dd class="col-sm-10">@serviceopportunity.Location</dd>
+            <dt class="col-sm-2">Status</dt>
+            <dd class="col-sm-10">@serviceopportunity.Status</dd>
+            <dt class="col-sm-2">OrganizerUserId</dt>
+            <dd class="col-sm-10">@serviceopportunity.OrganizerUserId</dd>
+        </dl>
+        <div>
+            <a href="@($"/serviceopportunities/edit?id={serviceopportunity.Id}")">Edit</a> |
+            <a href="@($"/serviceopportunities")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private ServiceOpportunity? serviceopportunity;
+
+    [SupplyParameterFromQuery]
+    private Guid Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        serviceopportunity = await context.ServiceOpportunities.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (serviceopportunity is null)
+        {
+            NavigationManager.NotFound();
+        }
+    }
+}

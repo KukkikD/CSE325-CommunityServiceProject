@@ -1,0 +1,77 @@
+@page "/serviceopportunities/create"
+@using Microsoft.EntityFrameworkCore
+@using CSE325_CommunityServiceProject.Models
+@inject IDbContextFactory<CSE325_CommunityServiceProject.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>ServiceOpportunity</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="ServiceOpportunity" OnValidSubmit="AddServiceOpportunity" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="title" class="form-label">Title:</label> 
+                <InputText id="title" @bind-Value="ServiceOpportunity.Title" class="form-control" /> 
+                <ValidationMessage For="() => ServiceOpportunity.Title" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="description" class="form-label">Description:</label> 
+                <InputText id="description" @bind-Value="ServiceOpportunity.Description" class="form-control" /> 
+                <ValidationMessage For="() => ServiceOpportunity.Description" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="datetime" class="form-label">DateTime:</label> 
+                <InputDate id="datetime" @bind-Value="ServiceOpportunity.DateTime" class="form-control" /> 
+                <ValidationMessage For="() => ServiceOpportunity.DateTime" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="location" class="form-label">Location:</label> 
+                <InputText id="location" @bind-Value="ServiceOpportunity.Location" class="form-control" /> 
+                <ValidationMessage For="() => ServiceOpportunity.Location" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="status" class="form-label">Status</label>
+                <InputSelect id="status"
+                            @bind-Value="ServiceOpportunity.Status"
+                            class="form-control">
+                    @foreach (var status in Enum.GetValues<OpportunityStatus>())
+                    {
+                        <option value="@status">@status</option>
+                    }
+                </InputSelect>
+            </div>       
+            <div class="mb-3">
+                <label for="organizeruserid" class="form-label">OrganizerUserId:</label> 
+                <InputText id="organizeruserid" @bind-Value="ServiceOpportunity.OrganizerUserId" class="form-control" /> 
+                <ValidationMessage For="() => ServiceOpportunity.OrganizerUserId" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/serviceopportunities">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private ServiceOpportunity ServiceOpportunity { get; set; } = default!;
+
+    protected override void OnInitialized() => ServiceOpportunity ??= new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddServiceOpportunity()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.ServiceOpportunities.Add(ServiceOpportunity);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/serviceopportunities");
+    }
+}
