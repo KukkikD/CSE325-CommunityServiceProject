@@ -1,0 +1,75 @@
+@page "/serviceopportunities/delete"
+@using Microsoft.EntityFrameworkCore
+@using CSE325_CommunityServiceProject.Models
+@inject IDbContextFactory<CSE325_CommunityServiceProject.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Delete</PageTitle>
+
+<h1>Delete</h1>
+
+<p>Are you sure you want to delete this?</p>
+<div>
+    <h2>ServiceOpportunity</h2>
+    <hr />
+    @if (serviceopportunity is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Title</dt>
+            <dd class="col-sm-10">@serviceopportunity.Title</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Description</dt>
+            <dd class="col-sm-10">@serviceopportunity.Description</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">DateTime</dt>
+            <dd class="col-sm-10">@serviceopportunity.DateTime</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Location</dt>
+            <dd class="col-sm-10">@serviceopportunity.Location</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Status</dt>
+            <dd class="col-sm-10">@serviceopportunity.Status</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">OrganizerUserId</dt>
+            <dd class="col-sm-10">@serviceopportunity.OrganizerUserId</dd>
+        </dl>
+        <EditForm method="post" Model="serviceopportunity" OnValidSubmit="DeleteServiceOpportunity" FormName="delete" Enhance>
+            <button type="submit" class="btn btn-danger" disabled="@(serviceopportunity is null)">Delete</button> |
+            <a href="/serviceopportunities">Back to List</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    private ServiceOpportunity? serviceopportunity;
+
+    [SupplyParameterFromQuery]
+    private Guid Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        serviceopportunity = await context.ServiceOpportunities.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (serviceopportunity is null)
+        {
+            NavigationManager.NotFound();
+        }
+    }
+
+    private async Task DeleteServiceOpportunity()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.ServiceOpportunities.Remove(serviceopportunity!);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/serviceopportunities");
+    }
+}
