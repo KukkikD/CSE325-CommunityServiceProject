@@ -3,6 +3,11 @@
 @using CSE325_CommunityServiceProject.Models
 @inject IDbContextFactory<CSE325_CommunityServiceProject.Data.ApplicationDbContext> DbFactory
 @inject NavigationManager NavigationManager
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@using CSE325_CommunityServiceProject.Data
+@attribute [Authorize]
+@inject UserManager<ApplicationUser> UserManager
 
 <PageTitle>Create</PageTitle>
 
@@ -46,11 +51,6 @@
                     }
                 </InputSelect>
             </div>       
-            <div class="mb-3">
-                <label for="organizeruserid" class="form-label">OrganizerUserId:</label> 
-                <InputText id="organizeruserid" @bind-Value="ServiceOpportunity.OrganizerUserId" class="form-control" /> 
-                <ValidationMessage For="() => ServiceOpportunity.OrganizerUserId" class="text-danger" /> 
-            </div>        
             <button type="submit" class="btn btn-primary">Create</button>
         </EditForm>
     </div>
@@ -61,14 +61,27 @@
 </div>
 
 @code {
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthenticationStateTask { get; set; } = default!;
+
     [SupplyParameterFromForm]
     private ServiceOpportunity ServiceOpportunity { get; set; } = default!;
 
-    protected override void OnInitialized() => ServiceOpportunity ??= new();
+    protected override void OnInitialized()
+    {
+        ServiceOpportunity ??= new ServiceOpportunity
+        {
+            DateTime = DateTime.Today
+        };
+    }
 
-    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task AddServiceOpportunity()
     {
+        var user = (await AuthenticationStateTask).User;
+        ServiceOpportunity.OrganizerUserId =
+            UserManager.GetUserId(user)
+            ?? throw new InvalidOperationException("Sign in is required.");
+
         using var context = DbFactory.CreateDbContext();
         context.ServiceOpportunities.Add(ServiceOpportunity);
         await context.SaveChangesAsync();

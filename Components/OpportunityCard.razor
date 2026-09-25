@@ -1,0 +1,21 @@
+@using Models
+
+<article class="opportunity-card">
+    <h2>@Opportunity.Title</h2>
+
+    <p>@Opportunity.DateTime.ToString("MMM d, yyyy")</p>
+    <p>@Opportunity.Location</p>
+
+    <a href="@($"/serviceopportunities/details?id={Opportunity.Id}")"
+       aria-label="@($"View details for {Opportunity.Title}")">
+        View Details
+    </a>
+</article>
+
+
+
+
+@code {
+    [Parameter, EditorRequired]
+    public ServiceOpportunity Opportunity { get; set; } = default!;
+}

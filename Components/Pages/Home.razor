@@ -1,7 +1,41 @@
 ﻿@page "/"
+@using Microsoft.EntityFrameworkCore
+@using CSE325_CommunityServiceProject.Data
+@using CSE325_CommunityServiceProject.Models
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
 
-<PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
 
-Welcome to your new app.
+<PageTitle>Community Service Hub</PageTitle>
+
+
+@if (opportunities.Count == 0)
+{
+    <p>No opportunities are available yet.</p>
+}
+else
+{
+    <div>
+        @foreach (var opportunity in opportunities)
+        {
+            <OpportunityCard Opportunity="opportunity" />
+        }
+    </div>
+}
+
+
+
+
+@code {
+    public List<ServiceOpportunity> opportunities = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        await using var context = await DbFactory.CreateDbContextAsync();
+        
+        opportunities = await context.ServiceOpportunities
+            .AsNoTracking()
+            .OrderBy(opportunity => opportunity.DateTime)
+            .ToListAsync();
+    }
+}
