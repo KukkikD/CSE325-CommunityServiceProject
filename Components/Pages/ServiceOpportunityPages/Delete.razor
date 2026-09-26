@@ -3,7 +3,13 @@
 @using CSE325_CommunityServiceProject.Models
 @inject IDbContextFactory<CSE325_CommunityServiceProject.Data.ApplicationDbContext> DbFactory
 @inject NavigationManager NavigationManager
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Components.Authorization
+@using CSE325_CommunityServiceProject.Data
 
+@attribute [Authorize]
+@inject UserManager<ApplicationUser> UserManager
 <PageTitle>Delete</PageTitle>
 
 <h1>Delete</h1>
@@ -49,6 +55,9 @@
 </div>
 
 @code {
+
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthenticationStateTask { get; set; } = default!;
     private ServiceOpportunity? serviceopportunity;
 
     [SupplyParameterFromQuery]
@@ -56,8 +65,13 @@
 
     protected override async Task OnInitializedAsync()
     {
+        var user = (await AuthenticationStateTask).User;
+        var userId = UserManager.GetUserId(user);
+        
         using var context = DbFactory.CreateDbContext();
-        serviceopportunity = await context.ServiceOpportunities.FirstOrDefaultAsync(m => m.Id == Id);
+        serviceopportunity = await context.ServiceOpportunities
+        .FirstOrDefaultAsync(o =>
+            o.Id == Id && o.OrganizerUserId == userId);
 
         if (serviceopportunity is null)
         {
@@ -67,9 +81,24 @@
 
     private async Task DeleteServiceOpportunity()
     {
+         var userId = UserManager.GetUserId(
+        (await AuthenticationStateTask).User);
+
         using var context = DbFactory.CreateDbContext();
-        context.ServiceOpportunities.Remove(serviceopportunity!);
+
+        var opportunity = await context.ServiceOpportunities
+            .FirstOrDefaultAsync(o =>
+                o.Id == Id && o.OrganizerUserId == userId);
+
+        if (opportunity is null)
+        {
+            NavigationManager.NotFound();
+            return;
+        }
+
+        context.ServiceOpportunities.Remove(opportunity);
         await context.SaveChangesAsync();
+
         NavigationManager.NavigateTo("/serviceopportunities");
-    }
+        }
 }
