@@ -35,11 +35,25 @@
             <a href="@($"/servicetasks/create/{serviceopportunity.Id}")">Add New Task</a> |
             <a href="@($"/serviceopportunities")">Back to List</a>
         </div>
+
+        <div>
+            <h2>Tasks</h2>
+            <ul>
+                @foreach (var task in serviceTaskList)
+                {
+                    <li>@task.Title</li>
+                }
+                
+            </ul>
+        </div>
     }
 </div>
 
 @code {
+    
     private ServiceOpportunity? serviceopportunity;
+
+    private List<ServiceTask> serviceTaskList = [];
 
     [SupplyParameterFromQuery]
     private Guid Id { get; set; }
@@ -47,11 +61,19 @@
     protected override async Task OnInitializedAsync()
     {
         using var context = DbFactory.CreateDbContext();
-        serviceopportunity = await context.ServiceOpportunities.FirstOrDefaultAsync(m => m.Id == Id);
+
+        serviceopportunity = await context.ServiceOpportunities
+            .FirstOrDefaultAsync(m => m.Id == Id);
 
         if (serviceopportunity is null)
         {
             NavigationManager.NotFound();
         }
+
+        serviceTaskList = await context.ServiceTasks
+        
+            .Where(st => st.ServiceOpportunityId == serviceopportunity.Id)
+            .ToListAsync();
+        
     }
 }
