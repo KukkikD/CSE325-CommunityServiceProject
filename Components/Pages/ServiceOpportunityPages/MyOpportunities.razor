@@ -1,0 +1,67 @@
+@page "/my-opportunities"
+
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Authorization
+@using CSE325_CommunityServiceProject.Models
+@using CSE325_CommunityServiceProject.Data
+
+@attribute [Authorize]
+
+@inject IDbContextFactory<ApplicationDbContext> DbFactory 
+@inject UserManager<ApplicationUser> UserManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<PageTitle>My Opportunities </PageTitle>
+
+<h1>My Opportunities</h1>
+
+@if (isLoading)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    @if (createdOpportunities.Count == 0)
+        {
+            <p>You haven't created any opportunities yet.</p>
+        }
+        else
+        {
+            <div class="service-container">
+            @foreach (var opportunity in createdOpportunities)
+            {
+                    <OpportunityCard Opportunity="opportunity" />
+            }
+            </div>  
+        }
+}
+
+@code {
+    private List<ServiceOpportunity> createdOpportunities = [];
+
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider
+        .GetAuthenticationStateAsync();
+
+        var user = await UserManager.GetUserAsync(authState.User);
+
+        if (user is null)
+        {
+            isLoading = false;
+            return;
+        }
+
+        using var context = DbFactory.CreateDbContext();
+
+        createdOpportunities = await context.ServiceOpportunities
+        .Where(o => o.OrganizerUserId == user.Id)
+        .OrderBy(o => o.DateTime)
+        .ToListAsync();
+
+        isLoading = false;
+    }
+}
