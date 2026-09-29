@@ -17,7 +17,7 @@
 
 <h1>Edit</h1>
 
-<h2>ServiceOpportunity</h2>
+<h2>Edit Opportunity</h2>
 <hr />
 @if (ServiceOpportunity is null)
 {
@@ -42,7 +42,7 @@ else
                     <ValidationMessage For="() => ServiceOpportunity.Description" class="text-danger" />
                 </div>
                 <div class="mb-3">
-                    <label for="datetime" class="form-label">DateTime:</label>
+                    <label for="datetime" class="form-label">Date:</label>
                     <InputDate id="datetime" @bind-Value="ServiceOpportunity.DateTime" class="form-control" />
                     <ValidationMessage For="() => ServiceOpportunity.DateTime" class="text-danger" />
                 </div>
@@ -103,10 +103,10 @@ else
 
         ServiceOpportunity ??= savedOpportunity;
 
-            if (ServiceOpportunity is null)
-            {
-                NavigationManager.NotFound();
-            }
+        if (ServiceOpportunity is null)
+        {
+            NavigationManager.NotFound();
+        }
     }
 
     // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -116,7 +116,21 @@ else
         var userId = UserManager.GetUserId((await AuthenticationStateTask).User);
 
         using var context = DbFactory.CreateDbContext();
-        context.Attach(ServiceOpportunity!).State = EntityState.Modified;
+
+        var opportunity = await context.ServiceOpportunities
+        .FirstOrDefaultAsync(o => o.Id == ServiceOpportunity!.Id);
+
+        if (opportunity is null || opportunity.OrganizerUserId != userId)
+        {
+            NavigationManager.NotFound();
+            return;
+        }
+
+        opportunity.Title = ServiceOpportunity.Title;
+        opportunity.Description = ServiceOpportunity.Description;
+        opportunity.DateTime = ServiceOpportunity.DateTime;
+        opportunity.Location = ServiceOpportunity.Location;
+        opportunity.Status = ServiceOpportunity.Status;
 
         try
         {
