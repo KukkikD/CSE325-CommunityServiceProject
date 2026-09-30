@@ -17,10 +17,11 @@
 <QuickGrid Class="table" Items="context.ServiceOpportunities">
     <PropertyColumn Property="serviceopportunity => serviceopportunity.Title" />
     <PropertyColumn Property="serviceopportunity => serviceopportunity.Description" />
-    <PropertyColumn Property="serviceopportunity => serviceopportunity.DateTime" />
+    <TemplateColumn Title="Date">
+        <span>@context.DateTime.ToString("MMMM d, yyyy")</span>
+    </TemplateColumn>
     <PropertyColumn Property="serviceopportunity => serviceopportunity.Location" />
     <PropertyColumn Property="serviceopportunity => serviceopportunity.Status" />
-    <PropertyColumn Property="serviceopportunity => serviceopportunity.OrganizerUserId" />
 
     <TemplateColumn Context="serviceopportunity">
         <a href="@($"serviceopportunities/edit?id={serviceopportunity.Id}")">Edit</a> |

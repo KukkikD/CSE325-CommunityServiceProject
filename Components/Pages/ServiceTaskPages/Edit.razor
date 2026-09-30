@@ -1,0 +1,104 @@
+@page "/servicetasks/edit"
+@using Microsoft.EntityFrameworkCore
+@using CSE325_CommunityServiceProject.Models
+@inject IDbContextFactory<CSE325_CommunityServiceProject.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>ServiceTask</h2>
+<hr />
+@if (ServiceTask is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="ServiceTask" OnValidSubmit="UpdateServiceTask" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="ServiceTask.Id" value="@ServiceTask.Id" />
+                <div class="mb-3">
+                    <label for="title" class="form-label">Title:</label>
+                    <InputText id="title" @bind-Value="ServiceTask.Title" class="form-control" />
+                    <ValidationMessage For="() => ServiceTask.Title" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description:</label>
+                    <InputText id="description" @bind-Value="ServiceTask.Description" class="form-control" />
+                    <ValidationMessage For="() => ServiceTask.Description" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="volunteersneeded" class="form-label">VolunteersNeeded:</label>
+                    <InputNumber id="volunteersneeded" @bind-Value="ServiceTask.VolunteersNeeded" class="form-control" />
+                    <ValidationMessage For="() => ServiceTask.VolunteersNeeded" class="text-danger" />
+                </div>
+                @* <div class="mb-3">
+                    <label for="serviceopportunityid" class="form-label">ServiceOpportunityId:</label>
+                    <InputText id="serviceopportunityid" @bind-Value="ServiceTask.ServiceOpportunityId" class="form-control" />
+                    <ValidationMessage For="() => ServiceTask.ServiceOpportunityId" class="text-danger" />
+                </div> *@
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/servicetasks">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private Guid Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private ServiceTask? ServiceTask { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        ServiceTask ??= await context.ServiceTasks.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (ServiceTask is null)
+        {
+            NavigationManager.NotFound();
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateServiceTask()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(ServiceTask!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!ServiceTaskExists(ServiceTask!.Id))
+            {
+                NavigationManager.NotFound();
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/servicetasks");
+    }
+
+    private bool ServiceTaskExists(Guid id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.ServiceTasks.Any(e => e.Id == id);
+    }
+}

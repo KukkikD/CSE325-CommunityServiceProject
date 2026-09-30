@@ -1,102 +1,447 @@
+/* ========================================
+   Community Connect - Global Design System
+   ======================================== */
+
+:root {
+    /* Accessible UI colors */
+    --cc-primary: #1F5F4A;
+    --cc-action: #00606E;
+    --cc-text: #2D2D2D;
+    --cc-text-muted: #5C6670;
+    --cc-highlight: #F4B942;
+    --cc-background: #F8F9FA;
+    --cc-surface: #FFFFFF;
+
+    /* Supporting brand colors */
+    --cc-brand-green: #2E7D32;
+    --cc-secondary: #A7D7A5;
+    --cc-brand-teal: #007C91;
+
+    /* UI */
+    --cc-border: #D9E2DE;
+
+    --cc-radius-sm: 8px;
+    --cc-radius-md: 12px;
+    --cc-radius-lg: 18px;
+
+    --cc-shadow-sm: 0 2px 8px rgba(45, 45, 45, 0.08);
+    --cc-shadow-md: 0 6px 18px rgba(45, 45, 45, 0.10);
+}
+
+
+/* ========================================
+   Base
+   ======================================== */
+
 html,
 body {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: 'Poppins', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    color: var(--cc-text);
+    background-color: var(--cc-background);
+    font-size: 16px;
 }
+
+
+/* ========================================
+   Typography
+   ======================================== */
+
+h1 {
+    font-size: 2.25rem;
+    font-weight: 700;
+}
+
+h2 {
+    font-size: 1.75rem;
+    font-weight: 600;
+}
+
+h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+h1,
+h2,
+h3 {
+    color: var(--cc-text);
+}
+
+
+/* ========================================
+   Links
+   ======================================== */
 
 a,
 .btn-link {
-  color: #006bb7;
+    color: var(--cc-action);
 }
 
-.btn-primary {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+a:hover,
+.btn-link:hover {
+    color: var(--cc-primary);
 }
+
+
+/* ========================================
+   Primary Buttons
+   ======================================== */
+
+.btn-primary {
+    color: #ffffff;
+    background-color: var(--cc-primary);
+    border-color: var(--cc-primary);
+    border-radius: var(--cc-radius-sm);
+    font-weight: 600;
+}
+
+.btn-primary:hover {
+    color: #ffffff;
+    background-color: #174A3A;
+    border-color: #174A3A;
+}
+
+.btn-primary:disabled {
+    background-color: #829C93;
+    border-color: #829C93;
+    color: #ffffff;
+}
+
+
+/* ========================================
+   Forms
+   ======================================== */
+
+.form-control,
+.form-select {
+    min-height: 44px;
+    border: 1px solid var(--cc-border);
+    border-radius: var(--cc-radius-sm);
+}
+
+.form-label {
+    color: var(--cc-text);
+    font-weight: 600;
+}
+
+
+/* ========================================
+   Keyboard Focus / Accessibility
+   ======================================== */
 
 .btn:focus,
 .btn:active:focus,
 .btn-link.nav-link:focus,
 .form-control:focus,
+.form-select:focus,
 .form-check-input:focus {
-  box-shadow:
-    0 0 0 0.1rem white,
-    0 0 0 0.25rem #258cfb;
+    border-color: var(--cc-action);
+    box-shadow: 0 0 0 0.2rem rgba(0, 96, 110, 0.25);
 }
 
+
+/* ========================================
+   Page Content
+   ======================================== */
+
 .content {
-  padding-top: 1.1rem;
+    padding-top: 1.1rem;
 }
 
 h1:focus {
-  outline: none;
+    outline: none;
 }
 
-.valid.modified:not([type="checkbox"]) {
-  outline: 1px solid #26b050;
+
+/* ========================================
+   Blazor Validation
+   ======================================== */
+
+.valid.modified:not([type=checkbox]) {
+    outline: 1px solid #26b050;
 }
 
 .invalid {
-  outline: 1px solid #e50000;
+    outline: 1px solid #e50000;
 }
 
 .validation-message {
-  color: #e50000;
+    color: #b32121;
 }
 
+
+/* ========================================
+   Blazor Error Boundary
+   ======================================== */
+
 .blazor-error-boundary {
-  background:
-    url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTYiIGhlaWdodD0iNDkiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIG92ZXJmbG93PSJoaWRkZW4iPjxkZWZzPjxjbGlwUGF0aCBpZD0iY2xpcDAiPjxyZWN0IHg9IjIzNSIgeT0iNTEiIHdpZHRoPSI1NiIgaGVpZ2h0PSI0OSIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNjbGlwMCkiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0yMzUgLTUxKSI+PHBhdGggZD0iTTI2My41MDYgNTFDMjY0LjcxNyA1MSAyNjUuODEzIDUxLjQ4MzcgMjY2LjYwNiA1Mi4yNjU4TDI2Ny4wNTIgNTIuNzk4NyAyNjcuNTM5IDUzLjYyODMgMjkwLjE4NSA5Mi4xODMxIDI5MC41NDUgOTIuNzk1IDI5MC42NTYgOTIuOTk2QzI5MC44NzcgOTMuNTEzIDI5MSA5NC4wODE1IDI5MSA5NC42NzgyIDI5MSA5Ny4wNjUxIDI4OS4wMzggOTkgMjg2LjYxNyA5OUwyNDAuMzgzIDk5QzIzNy45NjMgOTkgMjM2IDk3LjA2NTEgMjM2IDk0LjY3ODIgMjM2IDk0LjM3OTkgMjM2LjAzMSA5NC4wODg2IDIzNi4wODkgOTMuODA3MkwyMzYuMzM4IDkzLjAxNjIgMjM2Ljg1OCA5Mi4xMzE0IDI1OS40NzMgNTMuNjI5NCAyNTkuOTYxIDUyLjc5ODUgMjYwLjQwNyA1Mi4yNjU4QzI2MS4yIDUxLjQ4MzcgMjYyLjI5NiA1MSAyNjMuNTA2IDUxWk0yNjMuNTg2IDY2LjAxODNDMjYwLjczNyA2Ni4wMTgzIDI1OS4zMTMgNjcuMTI0NSAyNTkuMzEzIDY5LjMzNyAyNTkuMzEzIDY5LjYxMDIgMjU5LjMzMiA2OS44NjA4IDI1OS4zNzEgNzAuMDg4N0wyNjEuNzk1IDg0LjAxNjEgMjY1LjM4IDg0LjAxNjEgMjY3LjgyMSA2OS43NDc1QzI2Ny44NiA2OS43MzA5IDI2Ny44NzkgNjkuNTg3NyAyNjcuODc5IDY5LjMxNzkgMjY3Ljg3OSA2Ny4xMTgyIDI2Ni40NDggNjYuMDE4MyAyNjMuNTg2IDY2LjAxODNaTTI2My41NzYgODYuMDU0N0MyNjEuMDQ5IDg2LjA1NDcgMjU5Ljc4NiA4Ny4zMDA1IDI1OS43ODYgODkuNzkyMSAyNTkuNzg2IDkyLjI4MzcgMjYxLjA0OSA5My41Mjk1IDI2My41NzYgOTMuNTI5NSAyNjYuMTE2IDkzLjUyOTUgMjY3LjM4NyA5Mi4yODM3IDI2Ny4zODcgODkuNzkyMSAyNjcuMzg3IDg3LjMwMDUgMjY2LjExNiA4Ni4wNTQ3IDI2My41NzYgODYuMDU0N1oiIGZpbGw9IiNGRkU1MDAiIGZpbGwtcnVsZT0iZXZlbm9kZCIvPjwvZz48L3N2Zz4=)
-      no-repeat 1rem/1.8rem,
-    #b32121;
-  padding: 1rem 1rem 1rem 3.7rem;
-  color: white;
+    background: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTYiIGhlaWdodD0iNDkiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBvdmVyZmxvdz0iaGlkZGVuIj48ZGVmcz48Y2xpcFBhdGggaWQ9ImNsaXAwIj48cmVjdCB4PSIyMzUiIHk9IjUxIiB3aWR0aD0iNTYiIGhlaWdodD0iNDkiLz48L2NsaXBQYXRoPjwvZGVmcz48ZyBjbGlwLXBhdGg9InVybCgjY2xpcDApIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMjM1IC01MSkiPjxwYXRoIGQ9Ik0yNjMuNTA2IDUxQzI2NC43MTcgNTEgMjY1LjgxMyA1MS40ODM3IDI2Ni42MDYgNTIuMjY1OEwyNjcuMDUyIDUyLjc5ODcgMjY3LjUzOSA1My42MjgzIDI5MC4xODUgOTIuMTgzMSAyOTAuNTQ1IDkyLjc5NSAyOTAuNjU2IDkyLjk5NkMyOTAuODc3IDkzLjUxMyAyOTEgOTQuMDgxNSAyOTEgOTQuNjc4MiAyOTEgOTcuMDY1MSAyODkuMDM4IDk5IDI4Ni42MTcgOTlMMjQwLjM4MyA5OUMyMzcuOTYzIDk5IDIzNiA5Ny4wNjUxIDIzNiA5NC42NzgyQzIzNiA5NC4zNzk5IDIzNi4wMzEgOTQuMDg4NiAyMzYuMDg5IDkzLjgwNzJMMjM2LjMzOCA5My4wMTYyIDIzNi44NTggOTIuMTMxNCAyNTkuNDczIDUzLjYyOTQgMjU5Ljk2MSA1Mi43OTg1IDI2MC40MDcgNTIuMjY1OEMyNjEuMiA1MS40ODM3IDI2Mi4yOTYgNTEgMjYzLjUwNiA1MVpNMjYzLjU4NiA2Ni4wMTgzQzI2MC43MzcgNjYuMDE4MyAyNTkuMzEzIDY3LjEyNDUgMjU5LjMxMyA2OS4zMzcgMjU5LjMxMyA2OS42MTAyIDI1OS4zMzIgNjkuODYwOCAyNTkuMzcxIDcwLjA4ODdMMjYxLjc5NSA4NC4wMTYxIDI2NS4zOCA4NC4wMTYxIDI2Ny44MjEgNjkuNzQ3NUMyNjcuODYgNjkuNzMwOSAyNjcuODc5IDY5LjU4NzcgMjY3Ljg3OSA2OS4zMTc5IDI2Ny44NzkgNjcuMTE4MiAyNjYuNDQ4IDY2LjAxODMgMjYzLjU4NiA2Ni4wMTgzWk0yNjMuNTc2IDg2LjA1NDdDMjYxLjA0OSA4Ni4wNTQ3IDI1OS43ODYgODcuMzAwNSAyNTkuNzg2IDg5Ljc5MjEgMjU5Ljc4NiA5Mi4yODM3IDI2MS4wNDkgOTMuNTI5NSAyNjMuNTc2IDkzLjUyOTUgMjY2LjExNiA5My41Mjk1IDI2Ny4zODcgOTIuMjgzNyAyNjcuMzg3IDg5Ljc5MjEgMjY3LjM4NyA4Ny4zMDA1IDI2Ni4xMTYgODYuMDU0NyAyNjMuNTc2IDg2LjA1NDdaIiBmaWxsPSIjRkZFNTAwIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz48L2c+PC9zdmc+) no-repeat 1rem/1.8rem, #b32121;
+
+    padding: 1rem 1rem 1rem 3.7rem;
+    color: white;
 }
 
 .blazor-error-boundary::after {
-  content: "An error has occurred.";
+    content: "An error has occurred.";
 }
 
 .darker-border-checkbox.form-check-input {
-  border-color: #929292;
+    border-color: #929292;
 }
 
-.service-container {
-  display: grid;
-  width: 100%;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
-  gap: 1.5rem;
-  align-items: stretch;
+/* ========================================
+   Volunteer Sign-Up
+   ======================================== */
+
+.volunteer-signup {
+    max-width: 850px;
+    margin: 0 auto;
+    padding: 1.5rem 0 3rem;
 }
 
-.service-container > .opportunity-card {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  min-height: 15rem;
-  height: 100%;
-  padding: 1.25rem;
-  border: 1px solid #d8e2dc;
-  border-radius: 0.75rem;
-  background: #fff;
-  box-shadow: 0 2px 10px rgb(31 95 74 / 8%);
+
+/* Section heading */
+
+.section-header {
+    margin-bottom: 1.5rem;
 }
 
-.service-container > .opportunity-card a {
-  margin-top: auto;
-  padding: 0.65rem 1rem;
-  border-radius: 0.5rem;
-  background: #1f5f4a;
-  color: #fff;
-  text-align: center;
-  text-decoration: none;
+.section-label {
+    display: inline-block;
+    margin-bottom: 0.4rem;
+
+    color: var(--cc-primary);
+
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
 }
 
-.service-container > .opportunity-card a:hover {
-  background: #174a39;
+.section-header h2 {
+    margin-bottom: 0.4rem;
 }
 
-.service-container > .opportunity-card a:focus-visible {
-  outline: 3px solid #f4b942;
-  outline-offset: 3px;
+.section-header p {
+    margin-bottom: 0;
+    color: var(--cc-text-muted);
+}
+
+
+/* Volunteer form card */
+
+.volunteer-form-card {
+    padding: 1.5rem;
+
+    background-color: var(--cc-surface);
+
+    border: 1px solid var(--cc-border);
+    border-radius: var(--cc-radius-md);
+
+    box-shadow: var(--cc-shadow-sm);
+}
+
+
+/* Task selector */
+
+.volunteer-form-card .form-label {
+    margin-bottom: 0.5rem;
+}
+
+.volunteer-form-card .form-select {
+    width: 100%;
+}
+
+
+/* Sign-up button */
+
+.volunteer-button {
+    width: 100%;
+
+    min-height: 44px;
+
+    margin-top: 1rem;
+    padding: 0.65rem 1rem;
+}
+
+
+/* Success / error messages */
+
+.volunteer-form-card .alert {
+    border: 0;
+    border-radius: var(--cc-radius-sm);
+}
+
+.volunteer-form-card .alert-success {
+    color: #18563F;
+    background-color: #E4F3EB;
+}
+
+.volunteer-form-card .alert-danger {
+    color: #842029;
+    background-color: #F8D7DA;
+}
+
+
+/* ========================================
+   Volunteer List
+   ======================================== */
+
+.volunteer-list {
+    margin-top: 2rem;
+}
+
+.volunteer-list h3 {
+    margin-bottom: 1rem;
+}
+
+.volunteer-table {
+    margin-bottom: 0;
+
+    background-color: var(--cc-surface);
+
+    border: 1px solid var(--cc-border);
+    border-radius: var(--cc-radius-md);
+
+    overflow: hidden;
+}
+
+.volunteer-table thead th {
+    padding: 0.9rem 1rem;
+
+    color: var(--cc-primary);
+    background-color: #EDF5F1;
+
+    font-weight: 600;
+
+    border-bottom: 1px solid var(--cc-border);
+}
+
+.volunteer-table tbody td {
+    padding: 0.9rem 1rem;
+
+    vertical-align: middle;
+
+    border-color: var(--cc-border);
+}
+
+
+/* Empty volunteer list */
+
+.empty-state {
+    padding: 2rem;
+
+    text-align: center;
+
+    background-color: var(--cc-surface);
+
+    border: 1px dashed var(--cc-border);
+    border-radius: var(--cc-radius-md);
+}
+
+.empty-state p {
+    margin-bottom: 0.25rem;
+
+    color: var(--cc-text);
+
+    font-weight: 600;
+}
+
+.empty-state span {
+    color: var(--cc-text-muted);
+}
+
+
+/* ========================================
+   Volunteer Responsive Layout
+   ======================================== */
+
+@media (max-width: 768px) {
+
+    .volunteer-signup {
+        padding: 1rem 0 2rem;
+    }
+
+    .volunteer-form-card {
+        padding: 1rem;
+    }
+
+    .volunteer-table thead th,
+    .volunteer-table tbody td {
+        padding: 0.75rem;
+    }
+}
+
+/* ========================================
+   My Volunteer Signups
+   ======================================== */
+
+.my-signups {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.my-signup-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    min-height: 56px;
+    padding: 0.75rem 1rem;
+
+    background-color: var(--cc-surface);
+    border: 1px solid var(--cc-border);
+    border-radius: var(--cc-radius-sm);
+}
+
+.signup-task {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    font-weight: 500;
+}
+
+.signup-check {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 28px;
+    height: 28px;
+
+    color: var(--cc-primary);
+    background-color: #E4F3EB;
+
+    border-radius: 50%;
+
+    font-weight: 700;
+}
+
+.cancel-signup-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 40px;
+    height: 40px;
+
+    color: var(--cc-text-muted);
+    background: transparent;
+
+    border: 0;
+    border-radius: 50%;
+
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.cancel-signup-button:hover {
+    color: #842029;
+    background-color: #F8D7DA;
+}
+
+.cancel-signup-button:focus-visible {
+    outline: 3px solid rgba(0, 96, 110, 0.35);
+    outline-offset: 2px;
 }

@@ -1,0 +1,65 @@
+@page "/servicetasks/create/{serviceId:guid}"
+@using Microsoft.EntityFrameworkCore
+@using CSE325_CommunityServiceProject.Models
+@inject IDbContextFactory<CSE325_CommunityServiceProject.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>ServiceTask</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="ServiceTask" OnValidSubmit="AddServiceTask" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="title" class="form-label">Title:</label> 
+                <InputText id="title" @bind-Value="ServiceTask.Title" class="form-control" /> 
+                <ValidationMessage For="() => ServiceTask.Title" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="description" class="form-label">Description:</label> 
+                <InputText id="description" @bind-Value="ServiceTask.Description" class="form-control" /> 
+                <ValidationMessage For="() => ServiceTask.Description" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="volunteersneeded" class="form-label">VolunteersNeeded:</label> 
+                <InputNumber id="volunteersneeded" @bind-Value="ServiceTask.VolunteersNeeded" class="form-control" /> 
+                <ValidationMessage For="() => ServiceTask.VolunteersNeeded" class="text-danger" /> 
+            </div>        
+     
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/servicetasks">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private ServiceTask ServiceTask { get; set; } = default!;
+    [Parameter] public Guid serviceId { get; set; } = default!;
+
+    
+
+    protected override void OnInitialized() => ServiceTask ??= new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddServiceTask()
+    {
+        using var context = DbFactory.CreateDbContext();
+        
+        ServiceOpportunity serviceopportunity = await context.ServiceOpportunities.FirstOrDefaultAsync(m => m.Id == serviceId);
+
+        ServiceTask.ServiceOpportunity = serviceopportunity;
+
+        context.ServiceTasks.Add(ServiceTask);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/servicetasks");
+    }
+}

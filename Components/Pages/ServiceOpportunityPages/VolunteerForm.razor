@@ -1,0 +1,246 @@
+@page "/volunteer/{OpportunityId:guid}"
+@using CSE325_CommunityServiceProject.Models
+@using CSE325_CommunityServiceProject.Data
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+
+@inject ApplicationDbContext DbContext
+@inject UserManager<ApplicationUser> UserManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@* Volunteer sign-up form for a selected service opportunity. *@
+
+<section class="volunteer-signup" aria-labelledby="volunteer-heading">
+
+    @* Sign-up form *@
+    <div class="section-header">
+        <span class="section-label">GET INVOLVED</span>
+        <h2 id="volunteer-heading">Volunteer for this opportunity</h2>
+        <p>Choose a task below and sign up to help your community.</p>
+    </div>
+
+    <div class="volunteer-form-card">
+
+        <label for="taskSelect" class="form-label">
+            Choose a task
+        </label>
+
+        <InputSelect id="taskSelect"
+                     class="form-select"
+                     @bind-Value="selectedTaskId">
+
+            <option value="">Select a task</option>
+
+            @foreach (var task in Tasks)
+            {
+                <option value="@task.Id">
+                    @task.Title
+                </option>
+            }
+
+        </InputSelect>
+
+        @if (!string.IsNullOrEmpty(successMessage))
+        {
+            <div class="alert alert-success mt-3" role="alert">
+                @successMessage
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="alert alert-danger mt-3" role="alert">
+                @errorMessage
+            </div>
+        }
+      
+    
+        <button class="btn btn-primary volunteer-button"
+                @onclick="SignUp"
+                disabled="@(selectedTaskId is null)">
+            Sign Up to Help
+        </button>
+
+    </div>
+
+    @* Display only the tasks the current user has signed up for. *@
+    <div class="volunteer-list">
+        <h3>Your Signups</h3>
+
+        @if (mySignups.Count == 0)
+        {
+            <div class="empty-state">
+                <p>You haven't signed up for a task yet.</p>
+                <span>Choose a task above to get involved!</span>
+            </div>
+        }
+        else
+        {
+            <div class="my-signups">
+                @foreach (var signup in mySignups)
+                {
+                    <div class="my-signup-item">
+                        <div class="signup-task">
+                            <span class="signup-check" aria-hidden="true">✓</span>
+
+                            <span>@signup.ServiceTask.Title</span>
+                        </div>
+
+                        <button type="button"
+                                class="cancel-signup-button"
+                                @onclick="() => CancelSignup(signup.Id)"
+                                aria-label="Cancel signup for @signup.ServiceTask.Title"
+                                title="Cancel signup">
+                            ×
+                        </button>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+</section>
+
+@code {
+
+    // Receives the selected opportunity from the Opportunity Details page.
+    [Parameter]
+    public Guid OpportunityId { get; set; } 
+
+    // Tasks available for the selected service opportunity.
+    private List<ServiceTask> Tasks = []; 
+    
+    // Signups belonging to the currently signed-in user.
+    private List<VolunteerSignup> mySignups = []; 
+
+    private Guid? selectedTaskId;
+    private string? currentUserId;
+
+    // Load the opportunity tasks and identify the current user.
+    protected override async Task OnParametersSetAsync()
+    {
+        Tasks = await DbContext.ServiceTasks
+            .Where(t => t.ServiceOpportunityId == OpportunityId)
+            .ToListAsync();
+
+        var authState = await AuthenticationStateProvider
+            .GetAuthenticationStateAsync();
+
+        var user = await UserManager.GetUserAsync(authState.User);
+
+        currentUserId = user?.Id;
+
+        await LoadMySignups(); // Update the page without refreshing the browser.
+    }
+
+    // Load only the current user's signups for this opportunity.
+    private async Task LoadMySignups()
+    {
+        if (string.IsNullOrEmpty(currentUserId))
+        {
+            mySignups = [];
+            return;
+        }
+
+        mySignups = await DbContext.VolunteerSignups
+            .Include(v => v.ServiceTask)
+            .Where(v =>
+                v.VolunteerUserId == currentUserId &&
+                v.ServiceTask.ServiceOpportunityId == OpportunityId)
+            .OrderBy(v => v.ServiceTask.Title)
+            .ToListAsync();
+    }
+
+    // Create a volunteer signup for the selected task.
+    private async Task SignUp()
+    {
+        successMessage = string.Empty;
+        errorMessage = string.Empty;
+
+        // Do not continue if no task was selected.
+        if (selectedTaskId is null)
+        {
+            errorMessage = "Please select a task.";
+            return;
+        }
+
+        // Get the currently signed-in user.
+        var authState = await AuthenticationStateProvider
+            .GetAuthenticationStateAsync();
+
+        var user = await UserManager.GetUserAsync(authState.User);
+
+        if (user is null)
+        {
+            errorMessage = "Please sign in before volunteering.";
+            return;
+        }
+
+        // Check if the volunteer already signed up for this task.
+        var alreadySignedUp = await DbContext.VolunteerSignups
+            .AnyAsync(v =>
+                v.VolunteerUserId == user.Id &&
+                v.ServiceTaskId == selectedTaskId.Value);
+
+        if (alreadySignedUp)
+        {
+            errorMessage = "You are already signed up for this task.";
+            return;
+        }
+
+        try
+        {
+            var signup = new VolunteerSignup
+            {
+                Id = Guid.NewGuid(),
+                ServiceTaskId = selectedTaskId.Value,
+                VolunteerUserId = user.Id
+            };
+
+            DbContext.VolunteerSignups.Add(signup);
+            await DbContext.SaveChangesAsync();
+
+            successMessage = "Thank you! Your volunteer signup was successful.";
+            selectedTaskId = null;
+
+            await LoadMySignups(); // Update the page without refreshing the browser.
+        }
+        catch (DbUpdateException)
+        {
+            errorMessage = "We could not save your signup. Please try again.";
+        }
+    }
+
+    // Cancel a signup only if it belongs to the current user.
+    private async Task CancelSignup(Guid signupId)
+    {
+        successMessage = string.Empty;
+        errorMessage = string.Empty;
+
+        if (string.IsNullOrEmpty(currentUserId))
+        {
+            errorMessage = "Please sign in before managing your volunteer activities.";
+            return;
+        }
+
+        var signup = await DbContext.VolunteerSignups
+            .FirstOrDefaultAsync(v =>
+                v.Id == signupId &&
+                v.VolunteerUserId == currentUserId);
+
+        if (signup is null)
+        {
+            errorMessage = "We could not find this signup.";
+            return;
+        }
+
+        DbContext.VolunteerSignups.Remove(signup);
+        await DbContext.SaveChangesAsync();
+
+        successMessage = "Your volunteer signup was canceled.";
+
+        await LoadMySignups();
+    }
+    private string successMessage = string.Empty;
+    private string errorMessage = string.Empty;
+}
