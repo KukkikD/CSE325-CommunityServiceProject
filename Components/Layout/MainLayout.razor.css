@@ -4,9 +4,12 @@
     flex-direction: column;
 }
 
+/* Keep page content flexible so the shared footer stays at the bottom. */
 main {
     flex: 1;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
 }
 
 /* The current layout places NavMenu inside .sidebar. Present it as a header. */
@@ -32,15 +35,19 @@ main > .top-row {
     padding: 1.5rem 1rem !important;
 }
 
-/* These selectors also support the simplified layout shown in chat. */
-.site-header {
-    padding: 0.75rem 1rem 0;
+/* Shared footer for all Community Connect pages. */
+.app-footer {
+    width: min(100%, 75rem);
+    margin: auto auto 0;
+    padding: 1rem;
+    text-align: center;
+    color: #5C6670;
+    font-size: 0.875rem;
+    border-top: 1px solid #D9E2DE;
 }
 
-.site-content {
-    width: min(100%, 75rem);
-    margin: 0 auto;
-    padding: 1.5rem 1rem;
+.app-footer p {
+    margin: 0;
 }
 
 @media (max-width: 700px) {
