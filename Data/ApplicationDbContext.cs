@@ -19,5 +19,12 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         builder.Entity<VolunteerSignup>()
             .HasIndex(v => new { v.VolunteerUserId, v.ServiceTaskId })
             .IsUnique();
+
+        // VolunteerUserId is the foreign key for the Volunteer relationship.
+        builder.Entity<VolunteerSignup>()
+            .HasOne(v => v.Volunteer)
+            .WithMany()
+            .HasForeignKey(v => v.VolunteerUserId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
