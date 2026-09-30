@@ -1,0 +1,69 @@
+/* Present each service opportunity as a reusable card. */
+.opportunity-card {
+    height: 100%;
+    overflow: hidden;
+    border: 1px solid var(--cc-border);
+    border-radius: var(--cc-radius-md);
+    background: var(--cc-surface);
+    box-shadow: var(--cc-shadow-sm);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.opportunity-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--cc-shadow-md);
+}
+
+.opportunity-image {
+    display: block;
+    width: 100%;
+    height: 190px;
+    object-fit: cover;
+}
+
+.opportunity-content {
+    padding: 1.25rem;
+}
+
+.opportunity-content h3 {
+    margin: 0 0 1rem;
+    color: var(--cc-text);
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.opportunity-details {
+    margin-bottom: 1.25rem;
+}
+
+.opportunity-details p {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0 0 0.6rem;
+    color: var(--cc-text-muted);
+    font-size: 0.95rem;
+}
+
+.opportunity-details img {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+}
+
+.opportunity-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 42px;
+    padding: 0.6rem 1rem;
+    border-radius: var(--cc-radius-sm);
+    background: var(--cc-primary);
+    color: white;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.opportunity-link:hover {
+    background: var(--cc-action);
+    color: white;
+}

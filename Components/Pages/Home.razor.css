@@ -1,0 +1,159 @@
+/* Home hero introduces Community Connect and its main actions. */
+.home-hero {
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    align-items: center;
+    gap: 3rem;
+    min-height: 430px;
+    margin-bottom: 3.5rem;
+    padding: 2.5rem 0;
+}
+
+.hero-content {
+    max-width: 620px;
+}
+
+.hero-eyebrow,
+.section-eyebrow {
+    margin-bottom: 0.75rem;
+    color: var(--cc-primary);
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+}
+
+.hero-content h1 {
+    margin-bottom: 1rem;
+    color: var(--cc-text);
+    font-size: clamp(2.4rem, 4vw, 3.5rem);
+    font-weight: 700;
+    line-height: 1.08;
+}
+
+.hero-description {
+    max-width: 570px;
+    margin-bottom: 1.5rem;
+    color: var(--cc-text-muted);
+    font-size: 1.05rem;
+    line-height: 1.7;
+}
+
+.hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.hero-actions .btn {
+    min-height: 46px;
+    padding: 0.7rem 1.25rem;
+    border-radius: var(--cc-radius-sm);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.hero-primary {
+    border-color: var(--cc-primary);
+    background: var(--cc-primary);
+    color: white;
+}
+
+.hero-primary:hover {
+    border-color: var(--cc-action);
+    background: var(--cc-action);
+    color: white;
+}
+
+.hero-secondary {
+    border: 2px solid var(--cc-primary);
+    background: transparent;
+    color: var(--cc-primary);
+}
+
+.hero-secondary:hover {
+    background: var(--cc-primary);
+    color: white;
+}
+
+.hero-image {
+    display: flex;
+    justify-content: center;
+}
+
+.hero-image img {
+    display: block;
+    width: 100%;
+    max-width: 520px;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: var(--cc-radius-lg);
+    box-shadow: var(--cc-shadow-md);
+}
+
+/* Introduce the opportunity list as a separate section of the home page. */
+.opportunities-section {
+    padding: 1rem 0 3rem;
+}
+
+.section-heading {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.section-heading h2 {
+    margin-bottom: 0.5rem;
+    color: var(--cc-text);
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.section-heading > p:last-child {
+    color: var(--cc-text-muted);
+}
+
+.empty-opportunities {
+    padding: 2rem;
+    border: 1px solid var(--cc-border);
+    border-radius: var(--cc-radius-md);
+    background: var(--cc-surface);
+    text-align: center;
+}
+
+/* Stack the hero content on smaller screens. */
+@media (max-width: 800px) {
+    .home-hero {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        min-height: auto;
+        padding: 2rem 0;
+    }
+
+    .hero-image {
+        justify-content: flex-start;
+    }
+
+    .hero-image img {
+        max-width: 100%;
+    }
+
+    .hero-content h1 {
+        font-size: clamp(2.2rem, 10vw, 3.2rem);
+    }
+
+    .service-container {
+    grid-template-columns: 1fr;
+}
+}
+
+/* Arrange opportunity cards in a responsive grid. */
+.service-container {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.5rem;
+}
+
+@media (max-width: 900px) {
+    .service-container {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}

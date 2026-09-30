@@ -4,27 +4,67 @@
 @using CSE325_CommunityServiceProject.Models
 @inject IDbContextFactory<ApplicationDbContext> DbFactory
 
+<PageTitle>Community Connect</PageTitle>
 
+@* Hero section introduces the purpose of Community Connect. *@
+<section class="home-hero">
+    <div class="hero-content">
+        <p class="hero-eyebrow">COMMUNITY CONNECT</p>
 
-<PageTitle>Community Service Hub</PageTitle>
+        <h1>Connect. Serve.<br />Make a Difference.</h1>
 
+        <p class="hero-description">
+            Discover meaningful opportunities to serve, connect with others,
+            and make a positive difference in your community.
+        </p>
 
-@if (opportunities.Count == 0)
-{
-    <p>No opportunities are available yet.</p>
-}
-else
-{
-    <div class="service-container">
-        @foreach (var opportunity in opportunities)
-        {
-            <OpportunityCard Opportunity="opportunity" />
-        }
+        <div class="hero-actions">
+            <a class="btn btn-primary hero-primary"
+               href="#opportunities">
+                Find Opportunities
+            </a>
+
+            <AuthorizeView>
+                <Authorized>
+                    <a class="btn hero-secondary"
+                       href="serviceopportunities/create">
+                        Create Opportunity
+                    </a>
+                </Authorized>
+            </AuthorizeView>
+        </div>
     </div>
-}
 
+    <div class="hero-image">
+        <img src="images/illustrations/photo_volunteers.png"
+             alt="Community volunteers working together" />
+    </div>
+</section>
 
+@* Display available service opportunities from the database. *@
+<section id="opportunities" class="opportunities-section">
+    <div class="section-heading">
+        <p class="section-eyebrow">GET INVOLVED</p>
+        <h2>Community Opportunities</h2>
+        <p>Find a way to make a difference near you.</p>
+    </div>
 
+    @if (opportunities.Count == 0)
+    {
+        <div class="empty-opportunities">
+            <p>No opportunities are available yet.</p>
+        </div>
+    }
+    else
+    {
+        <div class="service-container">
+            @foreach (var opportunity in opportunities)
+            {
+                <OpportunityCard Opportunity="opportunity" />
+            }
+        </div>
+    }
+</section>
 
 @code {
     public List<ServiceOpportunity> opportunities = [];
@@ -32,7 +72,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         await using var context = await DbFactory.CreateDbContextAsync();
-        
+
         opportunities = await context.ServiceOpportunities
             .AsNoTracking()
             .OrderBy(opportunity => opportunity.DateTime)

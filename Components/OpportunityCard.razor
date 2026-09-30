@@ -1,19 +1,37 @@
 @using Models
 
 <article class="opportunity-card">
-    <h2>@Opportunity.Title</h2>
+    @* Use a shared community image until opportunities support their own images. *@
+    <img class="opportunity-image"
+         src="images/illustrations/photo_planting.png"
+         alt="" />
 
-    <p>@Opportunity.DateTime.ToString("MMM d, yyyy")</p>
-    <p>@Opportunity.Location</p>
+    <div class="opportunity-content">
+        <h3>@Opportunity.Title</h3>
 
-    <a href="@($"/serviceopportunities/details?id={Opportunity.Id}")"
-       aria-label="@($"View details for {Opportunity.Title}")">
-        View Details
-    </a>
+        <div class="opportunity-details">
+            <p>
+                <img src="images/icons/icon_calendar.png"
+                     alt=""
+                     aria-hidden="true" />
+                @Opportunity.DateTime.ToString("MMM d, yyyy")
+            </p>
+
+            <p>
+                <img src="images/icons/icon_location.png"
+                     alt=""
+                     aria-hidden="true" />
+                @Opportunity.Location
+            </p>
+        </div>
+
+        <a class="opportunity-link"
+           href="@($"/serviceopportunities/details?id={Opportunity.Id}")"
+           aria-label="@($"View details for {Opportunity.Title}")">
+            View Details
+        </a>
+    </div>
 </article>
-
-
-
 
 @code {
     [Parameter, EditorRequired]
