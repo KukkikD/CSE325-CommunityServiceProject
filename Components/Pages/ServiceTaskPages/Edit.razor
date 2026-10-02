@@ -20,7 +20,6 @@ else
         <div class="col-md-4">
             <EditForm method="post" Model="ServiceTask" OnValidSubmit="UpdateServiceTask" FormName="edit" Enhance>
                 <DataAnnotationsValidator />
-                <ValidationSummary role="alert"/>
                 <input type="hidden" name="ServiceTask.Id" value="@ServiceTask.Id" />
                 <div class="mb-3">
                     <label for="title" class="form-label">Title:</label>
@@ -49,7 +48,12 @@ else
 }
 
 <div>
-    <a href="/servicetasks">Back to List</a>
+    @if (ServiceTask is not null)
+    {
+        <a href="@($"/serviceopportunities/details?id={ServiceTask.ServiceOpportunityId}")">
+            Back to Opportunity
+        </a>
+    }
 </div>
 
 @code {
@@ -75,30 +79,26 @@ else
     private async Task UpdateServiceTask()
     {
         using var context = DbFactory.CreateDbContext();
-        context.Attach(ServiceTask!).State = EntityState.Modified;
 
-        try
+        var existingTask = await context.ServiceTasks
+            .FirstOrDefaultAsync(t => t.Id == ServiceTask!.Id);
+
+        if (existingTask is null)
         {
-            await context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!ServiceTaskExists(ServiceTask!.Id))
-            {
-                NavigationManager.NotFound();
-            }
-            else
-            {
-                throw;
-            }
+            NavigationManager.NotFound();
+            return;
         }
 
-        NavigationManager.NavigateTo("/servicetasks");
+        // Update only the fields that the user can edit.
+        existingTask.Title = ServiceTask!.Title;
+        existingTask.Description = ServiceTask.Description;
+        existingTask.VolunteersNeeded = ServiceTask.VolunteersNeeded;
+
+        await context.SaveChangesAsync();
+
+        NavigationManager.NavigateTo(
+            $"/serviceopportunities/details?id={existingTask.ServiceOpportunityId}");
     }
 
-    private bool ServiceTaskExists(Guid id)
-    {
-        using var context = DbFactory.CreateDbContext();
-        return context.ServiceTasks.Any(e => e.Id == id);
-    }
+    
 }

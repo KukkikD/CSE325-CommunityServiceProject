@@ -14,7 +14,6 @@
     <div class="col-md-4">
         <EditForm method="post" Model="ServiceTask" OnValidSubmit="AddServiceTask" FormName="create" Enhance>
             <DataAnnotationsValidator />
-            <ValidationSummary class="text-danger" role="alert"/>
             <div class="mb-3">
                 <label for="title" class="form-label">Title:</label> 
                 <InputText id="title" @bind-Value="ServiceTask.Title" class="form-control" /> 
@@ -37,7 +36,8 @@
 </div>
 
 <div>
-    <a href="/servicetasks">Back to List</a>
+    <a href="@($"/serviceopportunities/details?id={serviceId}")">
+        Back to Opportunity </a>
 </div>
 
 @code {
@@ -60,6 +60,7 @@
 
         context.ServiceTasks.Add(ServiceTask);
         await context.SaveChangesAsync();
-        NavigationManager.NavigateTo("/servicetasks");
+        NavigationManager.NavigateTo(
+            $"/serviceopportunities/details?id={serviceId}");
     }
 }

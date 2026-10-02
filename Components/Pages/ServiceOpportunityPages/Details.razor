@@ -34,33 +34,55 @@
             <dd class="col-sm-10">@(string.IsNullOrWhiteSpace(organizer?.PhoneNumber) ? "No Phone number provided" : organizer.PhoneNumber)</dd>
         </dl>
         <div>
-            <a href="@($"/serviceopportunities/edit?id={serviceopportunity.Id}")">Edit</a> |
-            <a href="@($"/servicetasks/create/{serviceopportunity.Id}")">Add New Task</a> |
-            <a href="@($"/volunteer/{serviceopportunity.Id}")">Sing Up to Help</a>            
-        </div>
+            <div>
+                <a href="@($"/serviceopportunities/edit?id={serviceopportunity.Id}")">Edit</a> |
+                <a href="@($"/volunteer/{serviceopportunity.Id}")">Sing Up to Help</a>
+            </div>         
+        </div>           
 
         <div class="mt-4">
-            <h2>Tasks</h2>
+        <h2>Tasks</h2>
 
-            @if (serviceTaskList.Count == 0)
+        @if (serviceTaskList.Count == 0)
+        {
+            <p>
+                No tasks have been added yet.
+                Add a task so volunteers can sign up.
+            </p>
+        }
+        else
+        {
+            @foreach (var task in serviceTaskList)
             {
-                <p>No tasks have been added to this opportunity yet.</p>
-            }
-            else
-            {
-                <ul>
-                    @foreach (var task in serviceTaskList)
+                <div class="mb-3">
+                    <h3>@task.Title</h3>
+
+                    @if (!string.IsNullOrWhiteSpace(task.Description))
                     {
-                        <li>@task.Title</li>
+                        <p>@task.Description</p>
                     }
-                </ul>
-            }
 
-            <a class="btn btn-primary mt-2"
-            href="@($"/servicetasks/create/{serviceopportunity.Id}")">
-            Add New Task
-            </a>
-        </div>
+                    <p>
+                        <strong>Volunteers Needed:</strong>
+                        @task.VolunteersNeeded
+                    </p>
+
+                    <a href="@($"/servicetasks/edit?id={task.Id}")">
+                        Edit
+                    </a>
+                    <span> | </span>
+                    <a href="@($"/servicetasks/delete?id={task.Id}")">
+                        Delete
+                    </a>
+                </div>
+            }
+        }
+
+        <a class="btn btn-primary mt-2"
+        href="@($"/servicetasks/create/{serviceopportunity.Id}")">
+            @(serviceTaskList.Count == 0 ? "Add First Task" : "Add New Task")
+        </a>
+    </div>
     }
 </div>
 

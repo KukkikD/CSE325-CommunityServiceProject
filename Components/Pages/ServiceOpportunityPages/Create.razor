@@ -85,6 +85,7 @@
         using var context = DbFactory.CreateDbContext();
         context.ServiceOpportunities.Add(ServiceOpportunity);
         await context.SaveChangesAsync();
-        NavigationManager.NavigateTo("/serviceopportunities");
+        NavigationManager.NavigateTo(
+        $"/serviceopportunities/details?id={ServiceOpportunity.Id}");
     }
 }
