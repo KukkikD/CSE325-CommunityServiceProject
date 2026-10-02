@@ -2,6 +2,7 @@
 
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Components.QuickGrid
 @using Microsoft.AspNetCore.Authorization
 @using CSE325_CommunityServiceProject.Models
 @using CSE325_CommunityServiceProject.Data
@@ -28,12 +29,22 @@ else
         }
         else
         {
-            <div class="service-container">
-            @foreach (var opportunity in createdOpportunities)
-            {
-                    <OpportunityCard Opportunity="opportunity" />
-            }
-            </div>  
+            <QuickGrid Class="table" Items="createdOpportunities.AsQueryable()">
+                <PropertyColumn Property="serviceopportunity => serviceopportunity.Title" />
+                <PropertyColumn Property="serviceopportunity => serviceopportunity.Description" />
+                <TemplateColumn Title="Date">
+                    <span>@context.DateTime.ToString("MMMM d, yyyy")</span>
+                </TemplateColumn>
+                
+                <PropertyColumn Property="serviceopportunity => serviceopportunity.Location" />
+                <PropertyColumn Property="serviceopportunity => serviceopportunity.Status" />
+
+                <TemplateColumn Context="serviceopportunity">
+                    <a href="@($"serviceopportunities/edit?id={serviceopportunity.Id}")">Edit</a> |
+                    <a href="@($"serviceopportunities/details?id={serviceopportunity.Id}")">Details</a> |
+                    <a href="@($"serviceopportunities/delete?id={serviceopportunity.Id}")">Delete</a>
+                </TemplateColumn>
+            </QuickGrid>
         }
 }
 
