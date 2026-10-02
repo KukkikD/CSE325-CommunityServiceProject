@@ -4,6 +4,10 @@
 @using CSE325_CommunityServiceProject.Data
 @inject IDbContextFactory<CSE325_CommunityServiceProject.Data.ApplicationDbContext> DbFactory
 @inject NavigationManager NavigationManager
+@using Microsoft.AspNetCore.Authorization
+
+
+@attribute [Authorize]
 
 <PageTitle>Details</PageTitle>
 
@@ -36,6 +40,7 @@
         <div>
             <a href="@($"/serviceopportunities/edit?id={serviceopportunity.Id}")">Edit</a> |
             <a href="@($"/servicetasks/create/{serviceopportunity.Id}")">Add New Task</a> |
+            <a href="@($"/servicetasks?serviceId={serviceopportunity.Id}")">Edit Tasks</a> |
             <a href="@($"/volunteer/{serviceopportunity.Id}")">Sing Up to Help</a>            
         </div>
 

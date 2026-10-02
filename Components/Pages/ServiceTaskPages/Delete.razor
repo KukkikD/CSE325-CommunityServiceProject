@@ -1,8 +1,13 @@
-@page "/servicetasks/delete"
+@page "/servicetasks/{serviceId}/delete"
 @using Microsoft.EntityFrameworkCore
 @using CSE325_CommunityServiceProject.Models
+@using Microsoft.AspNetCore.Authorization
 @inject IDbContextFactory<CSE325_CommunityServiceProject.Data.ApplicationDbContext> DbFactory
 @inject NavigationManager NavigationManager
+
+
+
+@attribute [Authorize]
 
 <PageTitle>Delete</PageTitle>
 
@@ -43,6 +48,9 @@
 @code {
     private ServiceTask? servicetask;
 
+    [Parameter]
+    public string serviceId { set; get; }
+
     [SupplyParameterFromQuery]
     private Guid Id { get; set; }
 
@@ -51,7 +59,7 @@
         using var context = DbFactory.CreateDbContext();
         servicetask = await context.ServiceTasks.FirstOrDefaultAsync(m => m.Id == Id);
 
-        if (servicetask is null)
+        if (servicetask is null || serviceId is null)
         {
             NavigationManager.NotFound();
         }
@@ -62,6 +70,6 @@
         using var context = DbFactory.CreateDbContext();
         context.ServiceTasks.Remove(servicetask!);
         await context.SaveChangesAsync();
-        NavigationManager.NavigateTo("/servicetasks");
+        NavigationManager.NavigateTo($"/servicetasks?serviceId={serviceId}");
     }
 }
