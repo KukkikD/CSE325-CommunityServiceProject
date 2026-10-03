@@ -40,7 +40,7 @@
         </dl>
         <EditForm method="post" Model="servicetask" OnValidSubmit="DeleteServiceTask" FormName="delete" Enhance>
             <button type="submit" class="btn btn-danger" disabled="@(servicetask is null)">Delete</button> |
-            <a href="/servicetasks">Back to List</a>
+            <a href="/servicetasks?serviceId=@servicetask.ServiceOpportunityId">Back to List</a>
         </EditForm>
     }
 </div>

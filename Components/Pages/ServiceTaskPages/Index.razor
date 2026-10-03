@@ -7,13 +7,9 @@
 @implements IAsyncDisposable
 @inject IDbContextFactory<CSE325_CommunityServiceProject.Data.ApplicationDbContext> DbFactory
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Project Tasks</PageTitle>
 
-<h1>Index</h1>
-
-<p>
-    <a href="servicetasks/create">Create New</a>
-</p>
+<h1>Project Tasks</h1>
 
 <QuickGrid Class="table" Items="@context.ServiceTasks.Where(p => p.ServiceOpportunityId == serviceId)">
     <PropertyColumn Property="servicetask => servicetask.Title" />
