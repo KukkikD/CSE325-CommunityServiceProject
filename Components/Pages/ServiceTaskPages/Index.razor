@@ -1,4 +1,5 @@
 @page "/servicetasks"
+
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using CSE325_CommunityServiceProject.Models
@@ -6,15 +7,11 @@
 @implements IAsyncDisposable
 @inject IDbContextFactory<CSE325_CommunityServiceProject.Data.ApplicationDbContext> DbFactory
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Project Tasks</PageTitle>
 
-<h1>Index</h1>
+<h1>Project Tasks</h1>
 
-<p>
-    <a href="servicetasks/create">Create New</a>
-</p>
-
-<QuickGrid Class="table" Items="context.ServiceTasks">
+<QuickGrid Class="table" Items="@context.ServiceTasks.Where(p => p.ServiceOpportunityId == serviceId)">
     <PropertyColumn Property="servicetask => servicetask.Title" />
     <PropertyColumn Property="servicetask => servicetask.Description" />
     <PropertyColumn Property="servicetask => servicetask.VolunteersNeeded" />
@@ -23,11 +20,14 @@
     <TemplateColumn Context="servicetask">
         <a href="@($"servicetasks/edit?id={servicetask.Id}")">Edit</a> |
         <a href="@($"servicetasks/details?id={servicetask.Id}")">Details</a> |
-        <a href="@($"servicetasks/delete?id={servicetask.Id}")">Delete</a>
+        <a href="@($"servicetasks/{serviceId}/delete?id={servicetask.Id}")">Delete</a>
     </TemplateColumn>
 </QuickGrid>
 
 @code {
+    [SupplyParameterFromQuery]
+    public Guid serviceId { get; set; }
+
     private ApplicationDbContext context = default!;
 
     protected override void OnInitialized()

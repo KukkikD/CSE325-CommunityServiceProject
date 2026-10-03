@@ -3,8 +3,14 @@
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using CSE325_CommunityServiceProject.Models
 @using CSE325_CommunityServiceProject.Data
+@using Microsoft.AspNetCore.Authorization
 @implements IAsyncDisposable
 @inject IDbContextFactory<CSE325_CommunityServiceProject.Data.ApplicationDbContext> DbFactory
+
+    
+
+
+@attribute [Authorize]
 
 <PageTitle>Index</PageTitle>
 
