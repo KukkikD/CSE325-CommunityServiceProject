@@ -4,40 +4,104 @@
 @inject IDbContextFactory<CSE325_CommunityServiceProject.Data.ApplicationDbContext> DbFactory
 @inject NavigationManager NavigationManager
 
-<PageTitle>Create</PageTitle>
+<PageTitle>Add Volunteer Task</PageTitle>
 
-<h1>Create</h1>
+<div class="container py-4">
 
-<h2>ServiceTask</h2>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <EditForm method="post" Model="ServiceTask" OnValidSubmit="AddServiceTask" FormName="create" Enhance>
-            <DataAnnotationsValidator />
-            <div class="mb-3">
-                <label for="title" class="form-label">Title:</label> 
-                <InputText id="title" @bind-Value="ServiceTask.Title" class="form-control" /> 
-                <ValidationMessage For="() => ServiceTask.Title" class="text-danger" /> 
-            </div>        
-            <div class="mb-3">
-                <label for="description" class="form-label">Description:</label> 
-                <InputText id="description" @bind-Value="ServiceTask.Description" class="form-control" /> 
-                <ValidationMessage For="() => ServiceTask.Description" class="text-danger" /> 
-            </div>        
-            <div class="mb-3">
-                <label for="volunteersneeded" class="form-label">VolunteersNeeded:</label> 
-                <InputNumber id="volunteersneeded" @bind-Value="ServiceTask.VolunteersNeeded" class="form-control" /> 
-                <ValidationMessage For="() => ServiceTask.VolunteersNeeded" class="text-danger" /> 
-            </div>        
-     
-            <button type="submit" class="btn btn-primary">Create</button>
-        </EditForm>
+    <div class="mb-4">
+        <p class="text-muted mb-1">Manage Opportunity</p>
+        <h1 class="mb-2">Add a Volunteer Task</h1>
+        <p class="text-muted">
+            Create a task that volunteers can sign up to help with.
+        </p>
     </div>
-</div>
 
-<div>
-    <a href="@($"/serviceopportunities/details?id={serviceId}")">
-        Back to Opportunity </a>
+    <div class="row">
+        <div class="col-lg-7 col-md-9">
+
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+
+                    <h2 class="h4 mb-3">Task Details</h2>
+
+                    <EditForm method="post"
+                              Model="ServiceTask"
+                              OnValidSubmit="AddServiceTask"
+                              FormName="create"
+                              Enhance>
+
+                        <DataAnnotationsValidator />
+
+                        <div class="mb-3">
+                            <label for="title"
+                                   class="form-label">
+                                Title
+                            </label>
+
+                            <InputText id="title"
+                                       @bind-Value="ServiceTask.Title"
+                                       class="form-control"
+                                       placeholder="Example: Set up tables and chairs" />
+
+                            <ValidationMessage For="() => ServiceTask.Title"
+                                               class="text-danger" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description"
+                                   class="form-label">
+                                Description
+                            </label>
+
+                            <InputText id="description"
+                                       @bind-Value="ServiceTask.Description"
+                                       class="form-control"
+                                       placeholder="Describe what volunteers will help with" />
+
+                            <ValidationMessage For="() => ServiceTask.Description"
+                                               class="text-danger" />
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="volunteersneeded"
+                                   class="form-label">
+                                Volunteers Needed
+                            </label>
+
+                            <InputNumber id="volunteersneeded"
+                                         @bind-Value="ServiceTask.VolunteersNeeded"
+                                         class="form-control"
+                                         min="1" />
+
+                            <ValidationMessage For="() => ServiceTask.VolunteersNeeded"
+                                               class="text-danger" />
+
+                            <div class="form-text">
+                                Enter the number of volunteers needed for this task.
+                            </div>
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-2">
+
+                            <button type="submit"
+                                    class="btn btn-primary">
+                                Add Task
+                            </button>
+
+                            <a href="@($"/serviceopportunities/details?id={serviceId}")"
+                               class="btn btn-outline-secondary">
+                                Cancel
+                            </a>
+
+                        </div>
+
+                    </EditForm>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
 </div>
 
 @code {
