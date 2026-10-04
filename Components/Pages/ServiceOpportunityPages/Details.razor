@@ -5,13 +5,14 @@
 @inject IDbContextFactory<CSE325_CommunityServiceProject.Data.ApplicationDbContext> DbFactory
 @inject NavigationManager NavigationManager
 @using Microsoft.AspNetCore.Authorization
-
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Components.Authorization
+@using CSE325_CommunityServiceProject.Data
+@inject UserManager<ApplicationUser> UserManager
 
 @attribute [Authorize]
 
 <PageTitle>Details</PageTitle>
-
-<h1>Details</h1>
 
 <PageTitle>Opportunity Details</PageTitle>
 
@@ -71,10 +72,14 @@
                 </div>
 
                 <div class="d-flex flex-wrap gap-2 mt-2">
-                    <a class="btn btn-outline-secondary"
+                    @if (isOwner)
+                    {
+                        <a class="btn btn-outline-secondary"
                        href="@($"/serviceopportunities/edit?id={serviceopportunity.Id}")">
-                        Edit Opportunity
-                    </a>
+                            Edit Opportunity
+                        </a>    
+                    }
+                    
 
                     <a class="btn btn-primary"
                        href="@($"/volunteer/{serviceopportunity.Id}")">
@@ -133,40 +138,48 @@
                                         <strong>Volunteers Needed:</strong>
                                         @task.VolunteersNeeded
                                     </p>
+                                    @if (isOwner)
+                                    {
+                                        <div class="d-flex gap-2">
+                                            <a class="btn btn-sm btn-outline-secondary"
+                                            href="@($"/servicetasks/edit?id={task.Id}")">
+                                                Edit
+                                            </a>
 
-                                    <div class="d-flex gap-2">
-                                        <a class="btn btn-sm btn-outline-secondary"
-                                           href="@($"/servicetasks/edit?id={task.Id}")">
-                                            Edit
-                                        </a>
-
-                                        <a class="btn btn-sm btn-outline-danger"
-                                           href="@($"/servicetasks/delete?id={task.Id}")">
-                                            Delete
-                                        </a>
-                                    </div>
+                                            <a class="btn btn-sm btn-outline-danger"
+                                            href="@($"/servicetasks/delete?id={task.Id}")">
+                                                Delete
+                                            </a>
+                                        </div>    
+                                    }
+                                    
                                 </div>
                             </div>
                         </div>
                     }
                 </div>
-
-                <div class="mt-3">
-                    <a class="btn btn-primary"
-                       href="@($"/servicetasks/create/{serviceopportunity.Id}")">
-                        Add New Task
-                    </a>
-                </div>
+                if (isOwner)
+                {
+                    <div class="mt-3">
+                        <a class="btn btn-primary"
+                        href="@($"/servicetasks/create/{serviceopportunity.Id}")">
+                            Add New Task
+                        </a>
+                    </div>
+                }
+                
             }
         </div>
     }
 </div>
 
 @code {
-    
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthenticationStateTask { get; set; } = default!;
     private ServiceOpportunity? serviceopportunity;
     private ApplicationUser? organizer;
 
+    private bool isOwner;
     private List<ServiceTask> serviceTaskList = [];
 
     [SupplyParameterFromQuery]
@@ -174,6 +187,9 @@
 
     protected override async Task OnInitializedAsync()
     {
+        var user = (await AuthenticationStateTask).User;
+        var userId = UserManager.GetUserId(user);
+
         using var context = DbFactory.CreateDbContext();
         serviceopportunity = await context.ServiceOpportunities
         .FirstOrDefaultAsync(m => m.Id == Id);
@@ -185,6 +201,14 @@
         }
 
         organizer = await context.Users.FirstOrDefaultAsync(u => u.Id == serviceopportunity.OrganizerUserId);
+
+        if (userId == organizer.Id)
+        {
+            isOwner = true;
+        } else
+        {
+            isOwner = false;
+        }
 
         serviceTaskList = await context.ServiceTasks
         .Where(st => st.ServiceOpportunityId == serviceopportunity.Id)
