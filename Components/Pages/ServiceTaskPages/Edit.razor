@@ -4,7 +4,10 @@
 @inject IDbContextFactory<CSE325_CommunityServiceProject.Data.ApplicationDbContext> DbFactory
 @inject NavigationManager NavigationManager
 @using Microsoft.AspNetCore.Authorization
-
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Components.Authorization
+@using CSE325_CommunityServiceProject.Data
+@inject UserManager<ApplicationUser> UserManager
 @attribute [Authorize]
 
 <PageTitle>Edit</PageTitle>
@@ -63,17 +66,23 @@ else
     [SupplyParameterFromQuery]
     private Guid Id { get; set; }
 
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthenticationStateTask { get; set; } = default!;
+
     [SupplyParameterFromForm]
     private ServiceTask? ServiceTask { get; set; }
-
+    
     protected override async Task OnInitializedAsync()
     {
+        var user = (await AuthenticationStateTask).User;
+        var userId = UserManager.GetUserId(user);
+
         using var context = DbFactory.CreateDbContext();
-        ServiceTask ??= await context.ServiceTasks.FirstOrDefaultAsync(m => m.Id == Id);
+        ServiceTask ??= await context.ServiceTasks.FirstOrDefaultAsync(t => t.Id == Id && t.ServiceOpportunity.OrganizerUserId == userId);
 
         if (ServiceTask is null)
         {
-            NavigationManager.NotFound();
+            NavigationManager.NavigateTo("/not-authorized");
         }
     }
 
@@ -81,14 +90,16 @@ else
     // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task UpdateServiceTask()
     {
+        var user = (await AuthenticationStateTask).User;
+        var userId = UserManager.GetUserId(user);
         using var context = DbFactory.CreateDbContext();
 
         var existingTask = await context.ServiceTasks
-            .FirstOrDefaultAsync(t => t.Id == ServiceTask!.Id);
+            .FirstOrDefaultAsync(t => t.Id == ServiceTask!.Id && ServiceTask.ServiceOpportunity.OrganizerUserId == userId);
 
         if (existingTask is null)
         {
-            NavigationManager.NotFound();
+            NavigationManager.NavigateTo("/not-authorized");
             return;
         }
 
