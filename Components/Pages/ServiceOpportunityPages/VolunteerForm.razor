@@ -10,6 +10,11 @@
 @inject UserManager<ApplicationUser> UserManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
+@using Microsoft.AspNetCore.Authorization
+
+
+@attribute [Authorize]
+
 @* Volunteer sign-up form for a selected service opportunity. *@
 
 <section class="volunteer-signup" aria-labelledby="volunteer-heading">
