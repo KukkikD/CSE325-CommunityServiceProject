@@ -4,7 +4,10 @@
 @inject IDbContextFactory<CSE325_CommunityServiceProject.Data.ApplicationDbContext> DbFactory
 @inject NavigationManager NavigationManager
 @using Microsoft.AspNetCore.Authorization
-
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Components.Authorization
+@using CSE325_CommunityServiceProject.Data
+@inject UserManager<ApplicationUser> UserManager
 
 @attribute [Authorize]
 
@@ -109,21 +112,45 @@
 </div>
 
 @code {
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthenticationStateTask { get; set; } = default!;
     [SupplyParameterFromForm]
     private ServiceTask ServiceTask { get; set; } = default!;
     [Parameter] public Guid serviceId { get; set; } = default!;
 
-    
 
-    protected override void OnInitialized() => ServiceTask ??= new();
 
-    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await AuthenticationStateTask).User;
+        var userId = UserManager.GetUserId(user);
+        using var context = DbFactory.CreateDbContext();
+
+        ServiceOpportunity serviceopportunity = await context.ServiceOpportunities.FirstOrDefaultAsync(m => m.Id == serviceId && m.OrganizerUserId == userId);        
+        
+        if (serviceopportunity is null)
+        {
+            NavigationManager.NavigateTo("/not-authorized");
+            return;
+        }
+        
+        ServiceTask ??= new();
+    }
+
     private async Task AddServiceTask()
     {
-        using var context = DbFactory.CreateDbContext();
-        
-        ServiceOpportunity serviceopportunity = await context.ServiceOpportunities.FirstOrDefaultAsync(m => m.Id == serviceId);
+        var user = (await AuthenticationStateTask).User;
+        var userId = UserManager.GetUserId(user);
 
+        using var context = DbFactory.CreateDbContext();
+
+        ServiceOpportunity serviceopportunity = await context.ServiceOpportunities.FirstOrDefaultAsync(m => m.Id == serviceId && m.OrganizerUserId == userId);
+
+        if (serviceopportunity is null)
+        {
+            NavigationManager.NavigateTo("/not-authorized");
+            return;
+        }
         ServiceTask.ServiceOpportunity = serviceopportunity;
 
         context.ServiceTasks.Add(ServiceTask);

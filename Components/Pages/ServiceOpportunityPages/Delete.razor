@@ -148,7 +148,7 @@
 
         if (serviceopportunity is null)
         {
-            NavigationManager.NotFound();
+            NavigationManager.NavigateTo("/not-authorized");
             return;
         }
 
@@ -169,7 +169,7 @@
 
         if (opportunity is null)
         {
-            NavigationManager.NotFound();
+            NavigationManager.NavigateTo("/not-authorized");
             return;
         }
 

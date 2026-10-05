@@ -175,8 +175,13 @@
         var savedOpportunity = await context.ServiceOpportunities
             .FirstOrDefaultAsync(o => o.Id == opportunityId);
 
-        if (savedOpportunity is null ||
-            savedOpportunity.OrganizerUserId != userId)
+        if (savedOpportunity.OrganizerUserId != userId)
+        {
+            NavigationManager.NavigateTo("/not-authorized");
+            return;
+        }
+
+        if (savedOpportunity is null)
         {
             NavigationManager.NotFound();
             return;

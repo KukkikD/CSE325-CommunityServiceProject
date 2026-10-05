@@ -1,14 +1,17 @@
-@page "/servicetasks/{serviceId}/delete"
+@page "/servicetasks/delete"
 @using Microsoft.EntityFrameworkCore
 @using CSE325_CommunityServiceProject.Models
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Components.Authorization
+@using CSE325_CommunityServiceProject.Data
 @inject IDbContextFactory<CSE325_CommunityServiceProject.Data.ApplicationDbContext> DbFactory
 @inject NavigationManager NavigationManager
 
 
 
 @attribute [Authorize]
-
+@inject UserManager<ApplicationUser> UserManager
 <PageTitle>Delete</PageTitle>
 
 <h1>Delete</h1>
@@ -44,23 +47,30 @@
 </div>
 
 @code {
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthenticationStateTask { get; set; } = default!;
     private ServiceTask? servicetask;
-
-    [Parameter]
-    public string serviceId { set; get; }
 
     [SupplyParameterFromQuery]
     private Guid Id { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        using var context = DbFactory.CreateDbContext();
-        servicetask = await context.ServiceTasks.FirstOrDefaultAsync(m => m.Id == Id);
+        var user = (await AuthenticationStateTask).User;
+        var userId = UserManager.GetUserId(user);
 
-        if (servicetask is null || serviceId is null)
+        using var context = DbFactory.CreateDbContext();
+        servicetask = await context.ServiceTasks
+        .FirstOrDefaultAsync(t =>
+        t.Id == Id && t.ServiceOpportunity.OrganizerUserId == userId);
+
+        if (servicetask is null )
         {
-            NavigationManager.NotFound();
+            NavigationManager.NavigateTo("/not-authorized");
+            return;
         }
+
+        
     }
 
     private async Task DeleteServiceTask()

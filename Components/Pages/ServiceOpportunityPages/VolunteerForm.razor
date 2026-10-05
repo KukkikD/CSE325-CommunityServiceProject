@@ -5,7 +5,7 @@
 @using CSE325_CommunityServiceProject.Data
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.EntityFrameworkCore
-
+@inject NavigationManager NavigationManager
 @inject ApplicationDbContext DbContext
 @inject UserManager<ApplicationUser> UserManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
@@ -216,6 +216,8 @@
         {
             errorMessage = "We could not save your signup. Please try again.";
         }
+
+        NavigationManager.NavigateTo("/");
     }
 
     // Cancel a signup only if it belongs to the current user.
