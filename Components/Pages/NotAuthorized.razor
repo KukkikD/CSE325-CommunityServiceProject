@@ -1,14 +1,35 @@
-
-
 @page "/not-authorized"
 @layout MainLayout
 
-
 <PageTitle>Not Authorized</PageTitle>
 
+<div class="container py-5">
 
-<h1>Not Authorized</h1>
-<p>Sorry, it seems that you don't have access to this feature. Please contact owner for details.</p>
+    <div class="row justify-content-center">
+        <div class="col-lg-7 col-md-9">
 
+            <div class="card shadow-sm">
+                <div class="card-body p-5 text-center">
 
-<a href="/">Back to Home</a>
+                    <div class="mb-3" style="font-size: 3rem;">
+                        🔒
+                    </div>
+
+                    <h1 class="h2 mb-3">Access Restricted</h1>
+
+                    <p class="text-muted mb-4">
+                        You don't have permission to manage this opportunity or task.
+                        Only the organizer can make changes.
+                    </p>
+
+                    <a href="/" class="btn btn-primary">
+                        Back to Home
+                    </a>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
