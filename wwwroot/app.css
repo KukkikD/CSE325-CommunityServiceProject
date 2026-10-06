@@ -41,6 +41,11 @@ body {
     font-size: 16px;
 }
 
+/* Accessible muted text */
+.text-muted {
+    color: #5C6670 !important;
+}
+
 
 /* ========================================
    Typography
@@ -444,4 +449,45 @@ h1:focus {
 .cancel-signup-button:focus-visible {
     outline: 3px solid rgba(0, 96, 110, 0.35);
     outline-offset: 2px;
+}
+
+/* Account settings navigation */
+.account-nav {
+    gap: 0.35rem;
+}
+
+.account-nav .nav-item .nav-link {
+    color: #2D2D2D;
+    border-radius: 0.5rem;
+    padding: 0.65rem 0.85rem;
+    font-weight: 500;
+}
+
+.account-nav .nav-item .nav-link:hover {
+    color: #1F5F4A;
+    background-color: #F8F9FA;
+}
+
+.account-nav.nav-pills .nav-link.active {
+    color: #ffffff !important;
+    background-color: var(--cc-primary) !important;
+}
+
+/* Read-only account fields */
+.account-readonly-field:disabled {
+    color: var(--cc-text) !important;
+    background-color: #F1F3F2;
+    opacity: 1;
+}
+
+.form-floating > .account-readonly-field:disabled ~ label {
+    color: var(--cc-text-muted) !important;
+    opacity: 1;
+}
+
+/* Keep floating form labels readable for accessibility */
+.form-floating > .form-control:focus ~ label,
+.form-floating > .form-control:not(:placeholder-shown) ~ label {
+    color: var(--cc-text-muted);
+    opacity: 1;
 }

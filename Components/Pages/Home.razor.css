@@ -140,9 +140,6 @@
         font-size: clamp(2.2rem, 10vw, 3.2rem);
     }
 
-    .service-container {
-    grid-template-columns: 1fr;
-}
 }
 
 /* Arrange opportunity cards in a responsive grid. */
@@ -152,8 +149,16 @@
     gap: 1.5rem;
 }
 
+/* Tablet */
 @media (max-width: 900px) {
     .service-container {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+    .service-container {
+        grid-template-columns: 1fr;
     }
 }

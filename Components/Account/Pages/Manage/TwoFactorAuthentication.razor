@@ -12,7 +12,8 @@
 <PageTitle>Two-factor authentication (2FA)</PageTitle>
 
 <StatusMessage />
-<h3>Two-factor authentication (2FA)</h3>
+<h2 class="h4">Two-factor authentication (2FA)</h2>
+
 @if (canTrack)
 {
     if (is2faEnabled)
@@ -51,7 +52,7 @@
         <a href="Account/Manage/GenerateRecoveryCodes" class="btn btn-primary">Reset recovery codes</a>
     }
 
-    <h4>Authenticator app</h4>
+    <h3 class="h5">Authenticator app</h3>
     @if (!hasAuthenticator)
     {
         <a href="Account/Manage/EnableAuthenticator" class="btn btn-primary">Add authenticator app</a>
