@@ -24,8 +24,19 @@ builder.Services.AddAuthentication(options =>
     .AddIdentityCookies();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
+
 builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
-    options.UseSqlite(connectionString));
+    {
+        if (builder.Environment.IsDevelopment())
+            {
+                options.UseSqlite(connectionString);
+            }
+        else
+            {
+                options.UseSqlServer(connectionString);
+            }
+    });
 
 builder.Services.AddQuickGridEntityFrameworkAdapter();
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
@@ -57,6 +68,11 @@ app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages:
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
+
+// Requested to AI because of problem on blazor.web.js 
+// at production server
+app.MapStaticAssets();
+
 app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
