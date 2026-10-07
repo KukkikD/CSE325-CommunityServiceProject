@@ -35,6 +35,8 @@ builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
         else
             {
                 options.UseSqlServer(connectionString);
+                options.ConfigureWarnings(w => 
+                    w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
             }
     });
 
