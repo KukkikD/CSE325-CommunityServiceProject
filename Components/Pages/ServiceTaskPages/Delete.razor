@@ -60,7 +60,10 @@
                             <div class="fw-semibold">Volunteers Needed</div>
                             <div>@servicetask.VolunteersNeeded</div>
                         </div>
-
+                        @if (errorMessage is not null)
+                        {
+                            <div class="alert alert-danger" role="alert">@errorMessage</div>
+                        }
                         <EditForm method="post"
                                   Model="servicetask"
                                   OnValidSubmit="DeleteServiceTask"
@@ -100,6 +103,7 @@
     [SupplyParameterFromQuery]
     private Guid Id { get; set; }
 
+    private string? errorMessage;
     protected override async Task OnInitializedAsync()
     {
         var user = (await AuthenticationStateTask).User;
@@ -116,17 +120,36 @@
             return;
         }
 
-        
+
     }
 
     private async Task DeleteServiceTask()
     {
         var opportunityId = servicetask!.ServiceOpportunityId;
+        var user = (await AuthenticationStateTask).User;
+        var userId = UserManager.GetUserId(user);
 
-        using var context = DbFactory.CreateDbContext();
+        try
+        {
+            using var context = DbFactory.CreateDbContext();
+            servicetask = await context.ServiceTasks
+            .FirstOrDefaultAsync(t =>
+            t.Id == Id && t.ServiceOpportunity.OrganizerUserId == userId);
 
-        context.ServiceTasks.Remove(servicetask);
-        await context.SaveChangesAsync();
+            if (servicetask is null )
+            {
+                NavigationManager.NavigateTo("/not-authorized");
+                return;
+            }
+            context.ServiceTasks.Remove(servicetask);
+            await context.SaveChangesAsync();    
+        }
+        catch(DbUpdateException)
+        {
+            errorMessage = "We couldn't delete the task. Please try again.";
+            return;
+        }
+
 
         NavigationManager.NavigateTo(
             $"/serviceopportunities/details?id={opportunityId}");

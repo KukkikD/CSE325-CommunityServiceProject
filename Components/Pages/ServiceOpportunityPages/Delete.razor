@@ -95,7 +95,10 @@
                         </div>
 
                         <hr />
-
+                        @if (errorMessage is not null)
+                        {
+                            <div class="alert alert-danger" role="alert">@errorMessage</div>
+                        }
                         <EditForm method="post"
                                   Model="serviceopportunity"
                                   OnValidSubmit="DeleteServiceOpportunity"
@@ -136,11 +139,13 @@
     [SupplyParameterFromQuery]
     private Guid Id { get; set; }
 
+    private string? errorMessage;
+
     protected override async Task OnInitializedAsync()
     {
         var user = (await AuthenticationStateTask).User;
         var userId = UserManager.GetUserId(user);
-        
+
         using var context = DbFactory.CreateDbContext();
         serviceopportunity = await context.ServiceOpportunities
         .FirstOrDefaultAsync(o =>
@@ -158,8 +163,10 @@
 
     private async Task DeleteServiceOpportunity()
     {
-         var userId = UserManager.GetUserId(
-        (await AuthenticationStateTask).User);
+        errorMessage = null;
+
+        var userId = UserManager.GetUserId(
+       (await AuthenticationStateTask).User);
 
         using var context = DbFactory.CreateDbContext();
 
@@ -172,9 +179,18 @@
             NavigationManager.NavigateTo("/not-authorized");
             return;
         }
+        try
+        {
+            context.ServiceOpportunities.Remove(opportunity);
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateException)
+        {
+            errorMessage = "We couldn't delete the opportunity. Please try again.";
+            return;
+        }
 
-        context.ServiceOpportunities.Remove(opportunity);
-        await context.SaveChangesAsync();
+        
 
         NavigationManager.NavigateTo("/my-opportunities");
         }

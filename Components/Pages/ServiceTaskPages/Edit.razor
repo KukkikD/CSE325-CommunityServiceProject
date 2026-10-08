@@ -94,7 +94,10 @@
                                     Enter the number of volunteers needed for this task.
                                 </div>
                             </div>
-
+                            @if (errorMessage is not null)
+                            {
+                                <div class="alert alert-danger" role="alert">@errorMessage</div>
+                            }
                             <div class="d-flex flex-wrap gap-2">
 
                                 <button type="submit"
@@ -129,7 +132,8 @@
 
     [SupplyParameterFromForm]
     private ServiceTask? ServiceTask { get; set; }
-    
+
+    private string? errorMessage;
     protected override async Task OnInitializedAsync()
     {
         var user = (await AuthenticationStateTask).User;
@@ -156,7 +160,7 @@
             .FirstOrDefaultAsync(t =>
             t.Id == ServiceTask!.Id &&
             t.ServiceOpportunity.OrganizerUserId == userId);
-            if (existingTask is null)
+        if (existingTask is null)
         {
             NavigationManager.NavigateTo("/not-authorized");
             return;
@@ -167,7 +171,21 @@
         existingTask.Description = ServiceTask.Description;
         existingTask.VolunteersNeeded = ServiceTask.VolunteersNeeded;
 
-        await context.SaveChangesAsync();
+        try
+        {
+            await context.SaveChangesAsync();        
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            NavigationManager.NotFound();
+            return;
+        }
+        catch (DbUpdateException)
+        {
+            errorMessage ="We couldn't edit the task. Please try again.";
+            return;
+        }
+
 
         NavigationManager.NavigateTo(
             $"/serviceopportunities/details?id={existingTask.ServiceOpportunityId}");
