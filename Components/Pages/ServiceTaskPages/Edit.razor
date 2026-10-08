@@ -12,14 +12,17 @@
 
 <PageTitle>Edit Volunteer Task</PageTitle>
 
+@* Renders Task Edit Form *@
 <div class="container py-4">
 
+    @* Wait for the Service Task to be available *@
     @if (ServiceTask is null)
     {
         <p><em>Loading...</em></p>
     }
     else
     {
+        @* TITLE BLOCK *@
         <div class="mb-4">
             <p class="text-muted mb-1">Manage Opportunity</p>
             <h1 class="mb-2">Edit Volunteer Task</h1>
@@ -28,83 +31,86 @@
             </p>
         </div>
 
+        @* FORM BLOCK *@
         <div class="row">
             <div class="col-lg-7 col-md-9">
-
                 <div class="card shadow-sm">
                     <div class="card-body p-4">
-
                         <h2 class="h4 mb-3">Task Details</h2>
 
                         <EditForm method="post"
-                                  Model="ServiceTask"
-                                  OnValidSubmit="UpdateServiceTask"
-                                  FormName="edit"
-                                  Enhance>
+                            Model="ServiceTask"
+                            OnValidSubmit="UpdateServiceTask"
+                            FormName="edit"
+                            Enhance>
 
                             <DataAnnotationsValidator />
 
+                            @* Form Title Input *@
                             <input type="hidden"
-                                   name="ServiceTask.Id"
-                                   value="@ServiceTask.Id" />
+                                name="ServiceTask.Id"
+                                value="@ServiceTask.Id" />
 
                             <div class="mb-3">
                                 <label for="title"
-                                       class="form-label">
-                                    Title
+                                    class="form-label">
+                                        Title
                                 </label>
 
                                 <InputText id="title"
-                                           @bind-Value="ServiceTask.Title"
-                                           class="form-control" />
+                                    @bind-Value="ServiceTask.Title"
+                                    class="form-control" />
 
                                 <ValidationMessage For="() => ServiceTask.Title"
-                                                   class="text-danger" />
+                                    class="text-danger" />
                             </div>
 
+                            @* Form Description Input *@
                             <div class="mb-3">
                                 <label for="description"
-                                       class="form-label">
+                                        class="form-label">
                                     Description
                                 </label>
 
                                 <InputText id="description"
-                                           @bind-Value="ServiceTask.Description"
-                                           class="form-control" />
+                                    @bind-Value="ServiceTask.Description"
+                                    class="form-control" />
 
                                 <ValidationMessage For="() => ServiceTask.Description"
-                                                   class="text-danger" />
+                                    class="text-danger" />
                             </div>
 
+                            @* Form Volunteers Needed Input *@
                             <div class="mb-4">
                                 <label for="volunteersneeded"
-                                       class="form-label">
-                                    Volunteers Needed
+                                    class="form-label">
+                                        Volunteers Needed
                                 </label>
 
                                 <InputNumber id="volunteersneeded"
-                                             @bind-Value="ServiceTask.VolunteersNeeded"
-                                             class="form-control"
-                                             min="1" />
+                                    @bind-Value="ServiceTask.VolunteersNeeded"
+                                    class="form-control"
+                                    min="1" />
 
                                 <ValidationMessage For="() => ServiceTask.VolunteersNeeded"
-                                                   class="text-danger" />
+                                    class="text-danger" />
 
                                 <div class="form-text">
                                     Enter the number of volunteers needed for this task.
                                 </div>
                             </div>
 
+                            @* Submit Button / Cancel Button *@
                             <div class="d-flex flex-wrap gap-2">
 
                                 <button type="submit"
-                                        class="btn btn-primary">
-                                    Save Changes
+                                    class="btn btn-primary">
+                                        Save Changes
                                 </button>
 
                                 <a href="@($"/serviceopportunities/details?id={ServiceTask.ServiceOpportunityId}")"
-                                   class="btn btn-outline-secondary">
-                                    Cancel
+                                    class="btn btn-outline-secondary">
+                                        Cancel
                                 </a>
 
                             </div>
@@ -113,7 +119,6 @@
 
                     </div>
                 </div>
-
             </div>
         </div>
     }
@@ -121,6 +126,7 @@
 </div>
 
 @code {
+    @* Parameters Required *@
     [SupplyParameterFromQuery]
     private Guid Id { get; set; }
 
@@ -130,45 +136,56 @@
     [SupplyParameterFromForm]
     private ServiceTask? ServiceTask { get; set; }
     
+    @* This method renders the page when opened *@
     protected override async Task OnInitializedAsync()
     {
+        @* Retrieve user information from session and store it *@
         var user = (await AuthenticationStateTask).User;
         var userId = UserManager.GetUserId(user);
 
+        @* Creates DB Context, query the Service Tasks from User's Service Opportunity *@
         using var context = DbFactory.CreateDbContext();
         ServiceTask ??= await context.ServiceTasks.FirstOrDefaultAsync(t => t.Id == Id && t.ServiceOpportunity.OrganizerUserId == userId);
 
+        @* If there is no Service Task send to Not Authorized page *@
         if (ServiceTask is null)
-        {
-            NavigationManager.NavigateTo("/not-authorized");
-        }
+            {
+                NavigationManager.NavigateTo("/not-authorized");
+            }
     }
 
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    @* Update Service Task Method: update data from Form *@
     private async Task UpdateServiceTask()
     {
+        @* Retrieve user information from session and store it *@
         var user = (await AuthenticationStateTask).User;
         var userId = UserManager.GetUserId(user);
+
+        @* Creates DB Context *@
         using var context = DbFactory.CreateDbContext();
 
+        @* Retrieve Service Task form database *@
         var existingTask = await context.ServiceTasks
             .FirstOrDefaultAsync(t =>
             t.Id == ServiceTask!.Id &&
             t.ServiceOpportunity.OrganizerUserId == userId);
-            if (existingTask is null)
-        {
-            NavigationManager.NavigateTo("/not-authorized");
-            return;
-        }
 
-        // Update only the fields that the user can edit.
+        @* Handles unfound Service Task *@
+        if (existingTask is null)
+            {
+                NavigationManager.NavigateTo("/not-authorized");
+                return;
+            }
+
+        @* Update only the fields that the user can edit. *@
         existingTask.Title = ServiceTask!.Title;
         existingTask.Description = ServiceTask.Description;
         existingTask.VolunteersNeeded = ServiceTask.VolunteersNeeded;
 
+        @* Save into database *@
         await context.SaveChangesAsync();
 
+        @* Redirect to Service Opportunity page *@
         NavigationManager.NavigateTo(
             $"/serviceopportunities/details?id={existingTask.ServiceOpportunityId}");
     }
