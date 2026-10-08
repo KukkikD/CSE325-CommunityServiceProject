@@ -143,6 +143,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        // Check user owns opportunity before displaying delete page
         var user = (await AuthenticationStateTask).User;
         var userId = UserManager.GetUserId(user);
 
@@ -163,6 +164,7 @@
 
     private async Task DeleteServiceOpportunity()
     {
+        //Check user ownership of opportunity before deletion
         errorMessage = null;
 
         var userId = UserManager.GetUserId(

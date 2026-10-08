@@ -185,6 +185,7 @@
 </div>
 
 @code {
+    // TaskSummary to allow count display of Task details
     private sealed class TaskSummary
     {
         public Guid Id { get; set; }
@@ -208,6 +209,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        // Load opportunity and related tasks with details
         var user = (await AuthenticationStateTask).User;
         var userId = UserManager.GetUserId(user);
 

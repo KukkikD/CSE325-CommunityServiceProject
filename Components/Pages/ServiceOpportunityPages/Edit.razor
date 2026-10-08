@@ -170,6 +170,7 @@
     private string? errorMessage;
     protected override async Task OnInitializedAsync()
     {
+        // Load only if current user is owner of the opportunity
         var user = (await AuthenticationStateTask).User;
         var userId = UserManager.GetUserId(user);
 
@@ -201,10 +202,9 @@
         }
     }
 
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task UpdateServiceOpportunity()
     {
+        // Update only if current user is owner of opportunity
         var userId = UserManager.GetUserId((await AuthenticationStateTask).User);
 
         using var context = DbFactory.CreateDbContext();
