@@ -138,6 +138,17 @@
                                         <strong>Volunteers Needed:</strong>
                                         @task.VolunteersNeeded
                                     </p>
+                                    <p class="mb-3">
+                                        <strong>Volunteer Signups: </strong>
+                                        @if (task.SignupCount > 0)
+                                        {
+                                            <span>@task.SignupCount</span>
+                                        }
+                                        else
+                                        {
+                                           <span>No volunteers signed up yet.</span>
+                                        }
+                                    </p>
                                     @if (isOwner)
                                     {
                                         <div class="d-flex gap-2">
@@ -174,19 +185,31 @@
 </div>
 
 @code {
+    // TaskSummary to allow count display of Task details
+    private sealed class TaskSummary
+    {
+        public Guid Id { get; set; }
+        public string Title { get; set; } = "";
+        public string Description { get; set; } = "";
+        public int VolunteersNeeded { get; set; }
+        public int SignupCount { get; set; }
+    }
     [CascadingParameter]
     private Task<AuthenticationState> AuthenticationStateTask { get; set; } = default!;
     private ServiceOpportunity? serviceopportunity;
     private ApplicationUser? organizer;
 
     private bool isOwner;
-    private List<ServiceTask> serviceTaskList = [];
+    private List<TaskSummary> serviceTaskList = [];
+
+    private int VolunteerSignups = 0;
 
     [SupplyParameterFromQuery]
     private Guid Id { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
+        // Load opportunity and related tasks with details
         var user = (await AuthenticationStateTask).User;
         var userId = UserManager.GetUserId(user);
 
@@ -212,6 +235,14 @@
 
         serviceTaskList = await context.ServiceTasks
         .Where(st => st.ServiceOpportunityId == serviceopportunity.Id)
+        .Select(st => new TaskSummary
+        {
+            Id= st.Id,
+            Title = st.Title,
+            Description = st.Description,
+            VolunteersNeeded = st.VolunteersNeeded,
+            SignupCount = st.VolunteerSignups.Count
+        })
         .ToListAsync();
     }
 }

@@ -87,7 +87,10 @@
                                 Enter the number of volunteers needed for this task.
                             </div>
                         </div>
-
+                         @if (errorMessage is not null)
+                        {
+                            <div class="alert alert-danger" role="alert">@errorMessage</div>
+                        }
                         <div class="d-flex flex-wrap gap-2">
 
                             <button type="submit"
@@ -118,7 +121,7 @@
     private ServiceTask ServiceTask { get; set; } = default!;
     [Parameter] public Guid serviceId { get; set; } = default!;
 
-
+    private string? errorMessage;
 
     protected override async Task OnInitializedAsync()
     {
@@ -127,13 +130,13 @@
         using var context = DbFactory.CreateDbContext();
 
         ServiceOpportunity serviceopportunity = await context.ServiceOpportunities.FirstOrDefaultAsync(m => m.Id == serviceId && m.OrganizerUserId == userId);        
-        
+
         if (serviceopportunity is null)
         {
             NavigationManager.NavigateTo("/not-authorized");
             return;
         }
-        
+
         ServiceTask ??= new();
     }
 
@@ -153,8 +156,15 @@
         }
         ServiceTask.ServiceOpportunity = serviceopportunity;
 
-        context.ServiceTasks.Add(ServiceTask);
-        await context.SaveChangesAsync();
+        try
+        {
+            context.ServiceTasks.Add(ServiceTask);
+            await context.SaveChangesAsync();
+        } catch(DbUpdateException)
+        {
+            errorMessage = "We couldn't create the task. Please try again.";
+            return;
+        }
         NavigationManager.NavigateTo(
             $"/serviceopportunities/details?id={serviceId}");
     }
