@@ -66,6 +66,12 @@
                             <div>@servicetask.VolunteersNeeded</div>
                         </div>
 
+                        @* Display Error Message *@
+                        @if (errorMessage is not null)
+                        {
+                            <div class="alert alert-danger" role="alert">@errorMessage</div>
+                        }
+
                         @* Delete Form *@
                         <EditForm method="post"
                                   Model="servicetask"
@@ -108,6 +114,8 @@
     [SupplyParameterFromQuery]
     private Guid Id { get; set; }
 
+    private string? errorMessage;
+
     @* This method renders the page when opened *@
     protected override async Task OnInitializedAsync()
     {
@@ -127,7 +135,6 @@
             NavigationManager.NavigateTo("/not-authorized");
             return;
         }
-        
     }
 
     @* Delete Service Task Method: delete data from Form *@
@@ -136,13 +143,35 @@
 
         @* Get opportunityId from service task details *@
         var opportunityId = servicetask!.ServiceOpportunityId;
+        var user = (await AuthenticationStateTask).User;
+        var userId = UserManager.GetUserId(user);
 
-        @* Creates DB Context *@
-        using var context = DbFactory.CreateDbContext();
+        try
+        {
+            @* Creates DB Context *@
+            using var context = DbFactory.CreateDbContext();
+            servicetask = await context.ServiceTasks
+            .FirstOrDefaultAsync(t =>
+            t.Id == Id && t.ServiceOpportunity.OrganizerUserId == userId);
 
-        @* Delete record from database *@
-        context.ServiceTasks.Remove(servicetask);
-        await context.SaveChangesAsync();
+            @* Redirect to Not Authorized page if there is no Service Task *@
+            if (servicetask is null )
+            {
+                NavigationManager.NavigateTo("/not-authorized");
+                return;
+            }
+
+            @* Delete record from database *@
+            context.ServiceTasks.Remove(servicetask);
+            await context.SaveChangesAsync();    
+        }
+        catch(DbUpdateException)
+        {
+            @* Error Message to Display *@
+            errorMessage = "We couldn't delete the task. Please try again.";
+            return;
+        }
+
 
         @* Redirect to Service Opportunity page *@
         NavigationManager.NavigateTo(

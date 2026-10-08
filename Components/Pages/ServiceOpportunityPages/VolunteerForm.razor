@@ -129,7 +129,8 @@
     protected override async Task OnParametersSetAsync()
     {
         Tasks = await DbContext.ServiceTasks
-            .Where(t => t.ServiceOpportunityId == OpportunityId)
+            .Where(t => t.ServiceOpportunityId == OpportunityId
+            && t.VolunteerSignups.Count < t.VolunteersNeeded)
             .ToListAsync();
 
         var authState = await AuthenticationStateProvider
@@ -184,7 +185,7 @@
             errorMessage = "Please sign in before volunteering.";
             return;
         }
-
+    
         // Check if the volunteer already signed up for this task.
         var alreadySignedUp = await DbContext.VolunteerSignups
             .AnyAsync(v =>
@@ -197,6 +198,17 @@
             return;
         }
 
+        // Check if the task already has enough volunteers
+        var hasSpace = await DbContext.ServiceTasks.AnyAsync(t =>
+            t.Id == selectedTaskId.Value &&
+            t.ServiceOpportunityId == OpportunityId &&
+            t.VolunteerSignups.Count < t.VolunteersNeeded);
+
+        if (!hasSpace)
+        {
+            errorMessage = "This task is full. Please choose another.";
+            return;
+        }
         try
         {
             var signup = new VolunteerSignup

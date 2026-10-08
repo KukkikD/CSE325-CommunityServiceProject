@@ -94,6 +94,12 @@
                             </div>
                         </div>
 
+                        @* Display Error Message *@
+                         @if (errorMessage is not null)
+                        {
+                            <div class="alert alert-danger" role="alert">@errorMessage</div>
+                        }
+
                         @* Submit Button / Cancel Button *@
                         <div class="d-flex flex-wrap gap-2">
 
@@ -126,6 +132,7 @@
     private ServiceTask ServiceTask { get; set; } = default!;
     [Parameter] public Guid serviceId { get; set; } = default!;
 
+    private string? errorMessage;
 
     @* This method renders the page when opened *@
     protected override async Task OnInitializedAsync()
@@ -147,6 +154,7 @@
             NavigationManager.NavigateTo("/not-authorized");
             return;
         }
+
         ServiceTask ??= new();
     }
 
@@ -173,11 +181,19 @@
         @* Load Service Opportunity *@
         ServiceTask.ServiceOpportunity = serviceopportunity;
 
-        @* Save the record on database *@
-        context.ServiceTasks.Add(ServiceTask);
-        await context.SaveChangesAsync();
+        try
+        {
+            @* Save the record on database *@
+            context.ServiceTasks.Add(ServiceTask);
+            await context.SaveChangesAsync();
+        } catch(DbUpdateException)
+        {
+            @* Error Message to Display *@
+            errorMessage = "We couldn't create the task. Please try again.";
+            return;
+        }
 
-        @* Redirect to Service Opportunity page *@
+        @* Redirect to Service Opportunity *@
         NavigationManager.NavigateTo(
             $"/serviceopportunities/details?id={serviceId}");
     }

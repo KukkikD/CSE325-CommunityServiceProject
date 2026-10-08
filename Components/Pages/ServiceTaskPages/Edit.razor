@@ -100,6 +100,12 @@
                                 </div>
                             </div>
 
+                            @* Display Error Message *@
+                            @if (errorMessage is not null)
+                            {
+                                <div class="alert alert-danger" role="alert">@errorMessage</div>
+                            }
+
                             @* Submit Button / Cancel Button *@
                             <div class="d-flex flex-wrap gap-2">
 
@@ -135,6 +141,8 @@
 
     [SupplyParameterFromForm]
     private ServiceTask? ServiceTask { get; set; }
+
+    private string? errorMessage;
     
     @* This method renders the page when opened *@
     protected override async Task OnInitializedAsync()
@@ -170,6 +178,13 @@
             t.Id == ServiceTask!.Id &&
             t.ServiceOpportunity.OrganizerUserId == userId);
 
+        @* If there is no Service Task, redirect to Not Authorized *@
+        if (existingTask is null)
+        {
+            NavigationManager.NavigateTo("/not-authorized");
+            return;
+        }
+
         @* Handles unfound Service Task *@
         if (existingTask is null)
             {
@@ -182,8 +197,24 @@
         existingTask.Description = ServiceTask.Description;
         existingTask.VolunteersNeeded = ServiceTask.VolunteersNeeded;
 
-        @* Save into database *@
-        await context.SaveChangesAsync();
+        try
+        {
+            @* Save into database *@
+            await context.SaveChangesAsync();        
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            @* Redirect to Not Found *@
+            NavigationManager.NotFound();
+            return;
+        }
+        catch (DbUpdateException)
+        {
+            @* Error Message *@
+            errorMessage ="We couldn't edit the task. Please try again.";
+            return;
+        }
+
 
         @* Redirect to Service Opportunity page *@
         NavigationManager.NavigateTo(
