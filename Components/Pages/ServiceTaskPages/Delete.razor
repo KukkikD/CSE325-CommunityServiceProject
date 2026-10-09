@@ -14,14 +14,17 @@
 @inject UserManager<ApplicationUser> UserManager
 <PageTitle>Delete Volunteer Task</PageTitle>
 
+@* Renders Task Delete Form *@
 <div class="container py-4">
 
+    @* Wait for the Service Task to be available *@
     @if (servicetask is null)
     {
         <p><em>Loading...</em></p>
     }
     else
     {
+        @* TITLE BLOCK *@
         <div class="mb-4">
             <p class="text-muted mb-1">Manage Opportunity</p>
             <h1 class="mb-2">Delete Volunteer Task</h1>
@@ -30,18 +33,20 @@
             </p>
         </div>
 
+        @* FORM BLOCK *@
         <div class="row">
             <div class="col-lg-7 col-md-9">
 
                 <div class="card shadow-sm">
                     <div class="card-body p-4">
-
+                        @* Confirmation / Disclaimer *@
                         <h2 class="h4 mb-3">Are you sure?</h2>
 
                         <div class="alert alert-danger" role="alert">
                             This action cannot be undone.
                         </div>
 
+                        @* Service Task Details *@
                         <div class="mb-3">
                             <div class="fw-semibold">Title</div>
                             <div>@servicetask.Title</div>
@@ -60,16 +65,21 @@
                             <div class="fw-semibold">Volunteers Needed</div>
                             <div>@servicetask.VolunteersNeeded</div>
                         </div>
+
+                        @* Display Error Message *@
                         @if (errorMessage is not null)
                         {
                             <div class="alert alert-danger" role="alert">@errorMessage</div>
                         }
+
+                        @* Delete Form *@
                         <EditForm method="post"
                                   Model="servicetask"
                                   OnValidSubmit="DeleteServiceTask"
                                   FormName="delete"
                                   Enhance>
 
+                            @* Confirm Button / Cancel Button *@
                             <div class="d-flex flex-wrap gap-2">
 
                                 <button type="submit"
@@ -96,6 +106,7 @@
 </div>
 
 @code {
+    @* PARAMETERS *@
     [CascadingParameter]
     private Task<AuthenticationState> AuthenticationStateTask { get; set; } = default!;
     private ServiceTask? servicetask;
@@ -104,53 +115,65 @@
     private Guid Id { get; set; }
 
     private string? errorMessage;
+
+    @* This method renders the page when opened *@
     protected override async Task OnInitializedAsync()
     {
+        @* Retrieve user information from session and store it *@
         var user = (await AuthenticationStateTask).User;
         var userId = UserManager.GetUserId(user);
 
+        @* Creates DB Context, query the Service Tasks from User's Service Opportunity *@
         using var context = DbFactory.CreateDbContext();
         servicetask = await context.ServiceTasks
         .FirstOrDefaultAsync(t =>
         t.Id == Id && t.ServiceOpportunity.OrganizerUserId == userId);
 
+        @* If there is no Service Task send to Not Authorized page *@
         if (servicetask is null )
         {
             NavigationManager.NavigateTo("/not-authorized");
             return;
         }
-
-
     }
 
+    @* Delete Service Task Method: delete data from Form *@
     private async Task DeleteServiceTask()
     {
+
+        @* Get opportunityId from service task details *@
         var opportunityId = servicetask!.ServiceOpportunityId;
         var user = (await AuthenticationStateTask).User;
         var userId = UserManager.GetUserId(user);
 
         try
         {
+            @* Creates DB Context *@
             using var context = DbFactory.CreateDbContext();
             servicetask = await context.ServiceTasks
             .FirstOrDefaultAsync(t =>
             t.Id == Id && t.ServiceOpportunity.OrganizerUserId == userId);
 
+            @* Redirect to Not Authorized page if there is no Service Task *@
             if (servicetask is null )
             {
                 NavigationManager.NavigateTo("/not-authorized");
                 return;
             }
+
+            @* Delete record from database *@
             context.ServiceTasks.Remove(servicetask);
             await context.SaveChangesAsync();    
         }
         catch(DbUpdateException)
         {
+            @* Error Message to Display *@
             errorMessage = "We couldn't delete the task. Please try again.";
             return;
         }
 
 
+        @* Redirect to Service Opportunity page *@
         NavigationManager.NavigateTo(
             $"/serviceopportunities/details?id={opportunityId}");
     }

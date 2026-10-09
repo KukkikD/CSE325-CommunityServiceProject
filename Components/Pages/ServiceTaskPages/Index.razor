@@ -11,6 +11,7 @@
 
 <h1>Project Tasks</h1>
 
+@* Service Task Grid: Renders the Service Tasks from serviceId provided on Query Parameter *@
 <QuickGrid Class="table" Items="@context.ServiceTasks.Where(p => p.ServiceOpportunityId == serviceId)">
     <PropertyColumn Property="servicetask => servicetask.Title" />
     <PropertyColumn Property="servicetask => servicetask.Description" />
@@ -25,15 +26,19 @@
 </QuickGrid>
 
 @code {
+    @* serviceId:Guid -> Query Parameter related to Service Opportunity *@
     [SupplyParameterFromQuery]
     public Guid serviceId { get; set; }
 
+    @* Database context *@
     private ApplicationDbContext context = default!;
 
+    @* When render the page, this method creates the database context *@
     protected override void OnInitialized()
     {
         context = DbFactory.CreateDbContext();
     }
 
+    @* Close database connection *@
     public async ValueTask DisposeAsync() => await context.DisposeAsync();
 }
