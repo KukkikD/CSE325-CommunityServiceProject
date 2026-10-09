@@ -118,7 +118,7 @@
     [CascadingParameter]
     private Task<AuthenticationState> AuthenticationStateTask { get; set; } = default!;
     [SupplyParameterFromForm]
-    private ServiceTask ServiceTask { get; set; } = default!;
+    private ServiceTask ServiceTask { get; set; } = new();
     [Parameter] public Guid serviceId { get; set; } = default!;
 
     private string? errorMessage;
