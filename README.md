@@ -222,7 +222,7 @@ Cloud deployment is part of the final project release process.
 
 The deployed application URL will be added here after the production deployment and final cloud testing are completed.
 
-**Deployment URL:** Coming soon
+**Deployment URL:** https://cse325-communityproject-c5apf6ckhvbthmaa.chilecentral-01.azurewebsites.net/
 
 After deployment, the team will verify:
 
